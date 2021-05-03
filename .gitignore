@@ -1,0 +1,27 @@
+
+# Nessie Demos artifacts
+nessie-runner-output.log
+colab/_assets/
+colab/spark_warehouse/
+colab/.ipynb_checkpoints/
+
+# Python venv
+venv/
+.tox/
+__pycache__/
+
+# Python package
+setup/build/
+setup/dist/
+setup/.eggs/
+setup/*.egg-info/
+
+# Jetbrains IDEs
+/.idea
+*.iws
+*.ipr
+*.iml
+
+# Misc
+*.DS_STORE/
+.DS_STORE/
