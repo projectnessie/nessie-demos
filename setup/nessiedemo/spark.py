@@ -45,7 +45,7 @@ class NessieDemoSpark:
         self.spark_conf(conf.set, nessie_ref)
         spark = SparkSession.builder.config(conf=conf).getOrCreate()
         sc = spark.sparkContext
-        jvm = self.setup_jvm_for_iceberg(sc)
+        jvm = self._jvm_for_iceberg(sc)
         print("Created SparkConf, SparkSession, SparkContext")
 
         return spark, sc, jvm
@@ -75,7 +75,7 @@ class NessieDemoSpark:
             "org.apache.iceberg.spark.SparkSessionCatalog",
         )
 
-    def setup_jvm_for_iceberg(self: T, spark_context: SparkContext) -> Any:
+    def _jvm_for_iceberg(self: T, spark_context: SparkContext) -> Any:
         """Nessie demo TODO docs."""
         jvm = spark_context._gateway.jvm
 
