@@ -31,6 +31,10 @@ class NessieDemoSpark:
     __demo: NessieDemo
     __assets_dir: str
 
+    __spark: SparkSession
+    __spark_context: SparkContext
+    __jvm: Any
+
     def __init__(self: T, demo: NessieDemo) -> None:
         """Creates a `NessieDemoSpark` instance for respectively using the given `NessieDemo` instance."""
         self.__demo = demo
@@ -63,12 +67,12 @@ class NessieDemoSpark:
         """
         print("Creating SparkConf, SparkSession, SparkContext ...")
         conf = self.__spark_conf(nessie_ref)
-        spark = SparkSession.builder.config(conf=conf).getOrCreate()
-        sc = spark.sparkContext
-        jvm = self.__jvm_for_iceberg(sc)
+        self.__spark = SparkSession.builder.config(conf=conf).getOrCreate()
+        self.__spark_context = self.__spark.sparkContext
+        self.__jvm = self.__jvm_for_iceberg(self.__spark_context)
         print("Created SparkConf, SparkSession, SparkContext")
 
-        return spark, sc, jvm
+        return self.__spark, self.__spark_context, self.__jvm
 
     def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
         conf = SparkConf()
@@ -106,6 +110,15 @@ class NessieDemoSpark:
         java_import(jvm, "org.apache.iceberg.PartitionSpec")
 
         return jvm
+
+    def session_for_ref(self: T, nessie_ref) -> SparkSession:
+        """Retrieve a new `SparkSession` ready to use against the given Nessie reference.
+
+        :param nessie_ref: the Nessie reference to configure in the `SparkConf`. Can be a branch name, tag name or commit hash.
+        :return: new `SparkSession`"""
+        new_session = self.__spark.newSession()
+        new_session.conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
+        return new_session
 
 
 def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any, NessieDemoSpark]
