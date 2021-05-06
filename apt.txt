@@ -1,1 +1,2 @@
+# For mybinder.org
 openjdk-11-jdk-headless
