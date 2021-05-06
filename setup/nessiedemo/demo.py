@@ -223,7 +223,7 @@ class NessieDemo:
         if dataset_name in self.__datasets:
             return self.__datasets[dataset_name]
 
-        dataset_root = "{}/datasets/{}/".format(self.__demos_root, dataset_name)
+        dataset_root = "{}/datasets/{}".format(self.__demos_root, dataset_name)
         contents = _Util.curl("{}/ls.txt".format(dataset_root)).decode("utf-8").split("\n")
         dataset_dir = os.path.join(self.__assets_dir, "datasets/{}".format(dataset_name))
         if not os.path.isdir(dataset_dir):
