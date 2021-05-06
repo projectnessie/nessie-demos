@@ -3,6 +3,12 @@
 cd $(dirname $0)
 . ../venv/bin/activate
 
-for f in *.ipynb; do
+if [[ -n $1 ]]; then
+  PATTERN="$1"
+else
+  PATTERN="*.ipynb"
+fi
+
+for f in $PATTERN; do
   jupyter nbconvert --ClearOutputPreprocessor.enabled=True --inplace $f
 done
