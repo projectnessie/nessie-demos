@@ -34,19 +34,23 @@ class NessieDemo:
 
     __assets_dir: str
 
-    __datasets: dict = dict()
+    __datasets: dict
 
     def __init__(self: T, versions_yaml: str) -> None:
         """Takes the name of the versions-dictionary."""
         self.__versions_yaml = versions_yaml
 
-        versions_url = "{}/configs/{}".format(self.__demos_root, self.__versions_yaml)
-
-        self.__assets_dir = (
+        if "NESSIE_DEMO_ROOT" in os.environ and len(os.environ["NESSIE_DEMO_ROOT"]) > 0:
+            self.__demos_root = os.environ["NESSIE_DEMO_ROOT"]
+        self.__assets_dir: str = (
             os.path.abspath(os.environ["NESSIE_DEMO_ASSETS"])
-            if "NESSIE_DEMO_ASSETS" in os.environ
+            if "NESSIE_DEMO_ASSETS" in os.environ and len(os.environ["NESSIE_DEMO_ASSETS"]) > 0
             else os.path.join(os.getcwd(), "_assets")
         )
+
+        self.__datasets = dict()
+
+        versions_url = "{}/configs/{}".format(self.__demos_root, self.__versions_yaml)
 
         self.__versions_dict = yaml.safe_load(_Util.curl(versions_url))
 
@@ -101,9 +105,6 @@ class NessieDemo:
                 self.get_nessie_version(),
             )
 
-        # TODO find a way to either download binaries to the same place (don't download AND STORE the same binary again)
-        # TODO find a way to remove the downloaded binaries
-
         _Util.wget(nessie_native_runner_url, self.__nessie_native_runner, executable=True)
 
     def __pid_file(self: T) -> str:
@@ -153,11 +154,9 @@ class NessieDemo:
             else:
                 return
 
-        # TODO need a way to actually _prevent_ multiple Nessie server instances
-        #  (in case steps are repeated, notebooks reloaded, etc)
-
         # TODO capture stdout+stderr using a daemon thread and pipe it to the notebook
-        std_capt = open("nessie-runner-output.log", "wb")
+        log_file = os.path.join(self.__assets_dir, "nessie-runner-output.log")
+        std_capt = open(log_file, "wb")
         try:
             print("Starting Nessie...")
 
@@ -183,7 +182,7 @@ class NessieDemo:
                 pass
         except Exception:
             std_capt.close()
-            os.unlink("nessie-runner-output.log")
+            os.unlink(log_file)
             raise
 
     def stop(self: T) -> None:
@@ -277,17 +276,25 @@ class _Util:
     def wget(url: str, target: str, executable: bool = False) -> None:
         try:
             print("Downloading {} ...".format(url))
-            with requests.get(url, stream=True) as resp:
-                if not resp.ok:
-                    raise Exception("Could not fetch {}, HTTP/{} {}".format(url, resp.status_code, resp.reason))
-                with open(target, "wb") as f:
-                    for chunk in resp.iter_content(chunk_size=65536):
-                        f.write(chunk)
-                if executable:
-                    os.chmod(
-                        target,
-                        os.stat(target).st_mode | stat.S_IXUSR,
-                    )
+            with open(target, "wb") as f:
+                if url.startswith("file://"):
+                    with open(url[7:], "rb") as inp:
+                        while True:
+                            chunk = inp.read(n=65536)
+                            if len(chunk) == 0:
+                                break
+                            f.write(chunk)
+                else:
+                    with requests.get(url, stream=True) as resp:
+                        if not resp.ok:
+                            raise Exception("Could not fetch {}, HTTP/{} {}".format(url, resp.status_code, resp.reason))
+                        for chunk in resp.iter_content(chunk_size=65536):
+                            f.write(chunk)
+            if executable:
+                os.chmod(
+                    target,
+                    os.stat(target).st_mode | stat.S_IXUSR,
+                )
             print("Completed download of {}".format(url))
         except Exception:
             if os.path.exists(target):
@@ -296,6 +303,10 @@ class _Util:
 
     @staticmethod
     def curl(url: str) -> bytes:
+        if url.startswith("file://"):
+            with open(url[7:], "rb") as inp:
+                return inp.read()
+
         with requests.get(url) as resp:
             if resp.ok:
                 return resp.content
