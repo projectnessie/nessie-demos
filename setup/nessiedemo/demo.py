@@ -4,7 +4,7 @@ import os
 import stat
 import subprocess  # noqa: S404
 import sys
-from typing import TypeVar
+from typing import TypeVar, Any
 
 import requests
 import yaml
@@ -31,6 +31,8 @@ class NessieDemo:
     _nessie_process: subprocess.Popen = None
 
     _assets_dir: os.path = None
+
+    _datasets: dict = dict()
 
     def __init__(self: T, versions_yaml: str, demos_root: str = None) -> None:
         """Nessie demo TODO docs."""
@@ -152,6 +154,9 @@ class NessieDemo:
 
     def fetch_dataset(self: T, dataset_name: str) -> dict:  # dict[str, os.path]
         """Nessie demo TODO docs."""
+        if dataset_name in self._datasets:
+            return self._datasets[dataset_name]
+
         dataset_root = "{}/datasets/{}/".format(self.demos_root, dataset_name)
         contents = _Util.curl("{}/ls.txt".format(dataset_root)).decode("utf-8").split("\n")
         dataset_dir = os.path.join(self._assets_dir, "datasets/{}".format(dataset_name))
@@ -168,6 +173,8 @@ class NessieDemo:
                 name_to_path[file_name] = f
 
         print("Dataset {} with files {}".format(dataset_name, ", ".join(name_to_path.keys())))
+
+        self._datasets[dataset_name] = name_to_path
 
         return name_to_path
 
@@ -208,3 +215,14 @@ class _Util:
                 return resp.content
             else:
                 raise Exception("Could not fetch {}, HTTP/{} {}".format(url, resp.status_code, resp.reason))
+
+
+def setup_demo(versions_yaml: str, datasets: Any) -> NessieDemo:  # datasets: list[str]  or  str
+    demo = NessieDemo(versions_yaml)
+    if datasets:
+        if isinstance(datasets, str):
+            datasets = [datasets]
+        for dataset_name in datasets:
+            demo.fetch_dataset(dataset_name)
+    demo.start()
+    return demo

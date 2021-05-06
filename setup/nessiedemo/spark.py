@@ -86,3 +86,9 @@ class NessieDemoSpark:
         java_import(jvm, "org.apache.iceberg.PartitionSpec")
 
         return jvm
+
+
+def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any, NessieDemoSpark]
+    demo_spark = NessieDemoSpark(demo)
+    spark, sc, jvm = demo_spark.get_or_create_spark_context(nessie_ref)
+    return spark, sc, jvm, demo_spark
