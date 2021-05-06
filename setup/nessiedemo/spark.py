@@ -111,11 +111,12 @@ class NessieDemoSpark:
 
         return jvm
 
-    def session_for_ref(self: T, nessie_ref) -> SparkSession:
+    def session_for_ref(self: T, nessie_ref: str) -> SparkSession:
         """Retrieve a new `SparkSession` ready to use against the given Nessie reference.
 
         :param nessie_ref: the Nessie reference to configure in the `SparkConf`. Can be a branch name, tag name or commit hash.
-        :return: new `SparkSession`"""
+        :return: new `SparkSession`
+        """
         new_session = self.__spark.newSession()
         new_session.conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
         return new_session
