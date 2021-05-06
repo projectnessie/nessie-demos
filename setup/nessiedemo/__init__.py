@@ -3,4 +3,4 @@
 
 __author__ = """Nessie Demo Setup"""
 __email__ = "nessie-release-builder@dremio.com"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
