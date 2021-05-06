@@ -56,7 +56,7 @@ class NessieDemo:
         """Todo the docs."""
         if self.is_nessie_running():
             run_info = "RUNNING, PID {}".format(self._pid_from_file())
-        else
+        else:
             run_info = "not running"
         return "Nessie-Demo: Nessie {nessie_version} ({nessie_running}), Apache Iceberg {iceberg_version}".format(
             nessie_version=self.get_nessie_version(),
