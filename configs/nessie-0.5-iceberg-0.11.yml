@@ -6,6 +6,8 @@ python_dependencies:
   pynessie: 0.5.1
   findspark: 1.4.2
   pyspark: 3.0.2
+  pandas: 1.2.4
+  pyarrow: 4.0.0
 
 spark:
   tarball: https://downloads.apache.org/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz
