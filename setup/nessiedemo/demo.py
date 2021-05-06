@@ -150,7 +150,7 @@ class NessieDemo:
                 self._nessie_process.wait()
             print("Nessie stopped")
 
-    def fetch_dataset(self: T, dataset_name: str) -> dict[str, os.path]:
+    def fetch_dataset(self: T, dataset_name: str) -> dict:  # dict[str, os.path]
         """Nessie demo TODO docs."""
         dataset_root = "{}/datasets/{}/".format(self.demos_root, dataset_name)
         contents = _Util.curl("{}/ls.txt".format(dataset_root)).decode("utf-8").split("\n")
@@ -174,7 +174,7 @@ class NessieDemo:
 
 class _Util:
     @staticmethod
-    def exec_fail(args: list[str]) -> None:
+    def exec_fail(args: list) -> None:
         print("Executing {} ...".format(" ".join(args)))
         result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa: S603
         if result.returncode != 0:

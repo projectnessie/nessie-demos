@@ -38,7 +38,7 @@ class NessieDemoSpark:
 
         findspark.init()
 
-    def get_or_create_spark_context(self: T, nessie_ref: str = "main") -> Tuple[SparkSession, SparkContext, Any]:
+    def get_or_create_spark_context(self: T, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any]
         """Nessie demo TODO docs."""
         print("Creating SparkConf, SparkSession, SparkContext ...")
         conf = SparkConf()
@@ -50,7 +50,7 @@ class NessieDemoSpark:
 
         return spark, sc, jvm
 
-    def spark_conf(self: T, conf_setter: Callable[[str, str], Any], nessie_ref: str = "main") -> None:
+    def spark_conf(self: T, conf_setter: Callable, nessie_ref: str = "main") -> None:  # conf_setter: Callable[[str, str], Any]
         """Nessie demo TODO docs."""
         conf_setter(
             "spark.jars.packages",
