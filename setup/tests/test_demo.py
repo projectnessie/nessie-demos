@@ -5,12 +5,14 @@ import os
 import shutil
 import signal
 
-from nessiedemo.demo import NessieDemo
 import pytest
+
+from nessiedemo.demo import NessieDemo
 
 
 @pytest.fixture(scope="session", autouse=True)
-def before_all(tmpdir_factory, request):
+def before_all(tmpdir_factory, request) -> None:  # noqa: ANN001
+    """Sets up env-vars to use a pytest temp-dir and use assets from the source-tree."""
     if "NESSIE_DEMO_ROOT" not in os.environ:
         d = os.path.abspath("..")
         if not os.path.exists(os.path.join(d, "configs")):
@@ -21,7 +23,7 @@ def before_all(tmpdir_factory, request):
         tmpdir = str(tmpdir_factory.mktemp("_assets"))
         os.environ["NESSIE_DEMO_ASSETS"] = tmpdir
 
-        def cleanup():
+        def __cleanup() -> None:
             f = os.path.join(tmpdir, "nessie.pid")
             if os.path.exists(f):
                 with open(f, "rb") as inp:
@@ -32,7 +34,7 @@ def before_all(tmpdir_factory, request):
                         pass
             shutil.rmtree(tmpdir, ignore_errors=True)
 
-        request.addfinalizer(cleanup)
+        request.addfinalizer(__cleanup)
 
 
 def test_new_instance_can_kill_nessie() -> None:

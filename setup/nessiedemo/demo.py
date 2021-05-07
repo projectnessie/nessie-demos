@@ -5,9 +5,9 @@ import signal
 import stat
 import subprocess  # noqa: S404
 import sys
-import time
 import threading
-from typing import Any, TypeVar
+import time
+from typing import Any, BinaryIO, TypeVar
 
 import requests
 import yaml
@@ -136,6 +136,24 @@ class NessieDemo:
             return True
         return self.__pid_from_file() > 0
 
+    @staticmethod
+    def __process_watchdog(proc: subprocess.Popen, std_capt: BinaryIO) -> None:
+        def __watch_process() -> None:
+            while True:
+                try:
+                    _, _ = proc.communicate(timeout=0.1)
+                    if proc.poll():
+                        break
+                except subprocess.TimeoutExpired:
+                    pass
+                except Exception:
+                    # There's not much we can do here
+                    break
+            std_capt.close()
+
+        comm_thread = threading.Thread(name="Comm Nessie PID {}".format(proc.pid), target=__watch_process, daemon=True)
+        comm_thread.start()
+
     def start(self: T) -> None:
         """Starts the Nessie process.
 
@@ -163,41 +181,28 @@ class NessieDemo:
         try:
             print("Starting Nessie...")
 
-            proc = subprocess.Popen(self.__nessie_native_runner, stdin=subprocess.DEVNULL, stdout=std_capt, stderr=std_capt)  # noqa: S603
-            self.__nessie_process = proc
+            self.__nessie_process = subprocess.Popen(  # noqa: S603
+                self.__nessie_native_runner, stdin=subprocess.DEVNULL, stdout=std_capt, stderr=std_capt
+            )
 
-            def watch_process():
-                while True:
-                    try:
-                        _, _ = proc.communicate(timeout=0.1)
-                        if proc.poll():
-                            break
-                    except subprocess.TimeoutExpired:
-                        pass
-                    except Exception:
-                        # There's not much we can do here
-                        break
-                std_capt.close()
-
-            comm_thread = threading.Thread(name="Comm Nessie PID {}".format(proc.pid), target=watch_process, daemon=True)
-            comm_thread.start()
+            self.__process_watchdog(self.__nessie_process, std_capt)
 
             with open(self._get_pid_file(), "wb") as out:
-                out.write(str(proc.pid).encode("utf-8"))
+                out.write(str(self.__nessie_process.pid).encode("utf-8"))
             with open(self._get_version_file(), "wb") as out:
                 out.write(self.get_nessie_version().encode("utf-8"))
 
             try:
-                proc.wait(self.__nessie_start_wait_seconds)
+                self.__nessie_process.wait(self.__nessie_start_wait_seconds)
                 with open(log_file) as log:
                     log_lines = log.readlines()
                 raise Exception(
                     "Nessie process disappeared. Exit-code: {}, stdout/stderr:\n  {}".format(
-                        proc.returncode, "  ".join(log_lines)
+                        self.__nessie_process.returncode, "  ".join(log_lines)
                     )
                 )
             except subprocess.TimeoutExpired:
-                print("Nessie running with PID {}".format(proc.pid))
+                print("Nessie running with PID {}".format(self.__nessie_process.pid))
                 pass
         except Exception:
             os.unlink(log_file)
