@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Tests for `nessiedemo` package."""
+"""Tests for `nessiedemo` package.
+
+Tests in this module are rather slow, because the nessie-quarkus-runner and Spark tarball are downloaded."""
 import os
 import shutil
 import signal
@@ -8,6 +10,7 @@ import signal
 import pytest
 
 from nessiedemo.demo import NessieDemo, setup_demo
+from nessiedemo.spark import spark_for_demo
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -83,3 +86,20 @@ def test_setup_method() -> None:
 
     assert demo2 is demo
     assert demo3 is demo
+
+
+def test_with_spark() -> None:
+    """Test NessieDemo plus NessieDemoSpark."""
+    demo = setup_demo("nessie-0.5-iceberg-0.11.yml")
+
+    spark, sc, jvm, demo_spark = spark_for_demo(demo)
+    assert spark.conf.get("spark.sql.catalog.nessie.ref") == "main"
+    assert spark.conf.get("spark.sql.catalog.nessie.url") == demo.get_nessie_api_uri()
+    assert spark.conf.get("spark.jars.packages") == "org.apache.iceberg:iceberg-spark3-runtime:" + demo.get_iceberg_version()
+    assert sc is not None
+    assert jvm is not None
+
+    spark_dev = demo_spark.session_for_ref("dev")
+    assert spark_dev.conf.get("spark.sql.catalog.nessie.ref") == "dev"
+    assert spark_dev.conf.get("spark.sql.catalog.nessie.url") == demo.get_nessie_api_uri()
+    assert spark_dev.conf.get("spark.jars.packages") == "org.apache.iceberg:iceberg-spark3-runtime:" + demo.get_iceberg_version()
