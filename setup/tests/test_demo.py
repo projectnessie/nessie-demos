@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 """Tests for `nessiedemo` package.
 
-Tests in this module are rather slow, because the nessie-quarkus-runner and Spark tarball are downloaded."""
+Tests in this module are rather slow, because the nessie-quarkus-runner and Spark tarball are downloaded.
+"""
 import os
 import shutil
 import signal
