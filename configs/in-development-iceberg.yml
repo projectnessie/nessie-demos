@@ -14,18 +14,33 @@
 # limitations under the License.
 #
 #
-# Nessie-Demo config-yaml to run demos against Nessie 0.5.1 and Iceberg 0.11.1 using Spark 3.0.2
+# Special configuration to run a Nessie Demo against Nessie and/or Iceberg built locally from source.
+#
+# Requires four environment variables:
+#
+# NESSIE_DEMO_IN_DEV_ICEBERG_VERSION : the Iceberg version, usually a short git ref
+#
+# Instructions:
+# 1. Setup Apache Iceberg
+# 1.1. Build Iceberg, publish to local maven repo
+#      `./gradlew clean publishToMavenLocal`
+# 1.2. Identify the version
+#      Lookup the version number from a built jar - e.g. in `nessie/build/libs/`
+# 2. Set environment variables:
+#    NESSIE_DEMO_IN_DEV_ICEBERG_VERSION to the version from step 1.2
+
+### THIS IS A CONFIG INTENDED FOR NESSIE DEVELOPERS! ###
 
 versions:
   nessie: 0.5.1
-  iceberg: 0.11.1
+  iceberg: !env NESSIE_DEMO_IN_DEV_ICEBERG_VERSION
 
 python_dependencies:
-  - pynessie==0.5.1
   - findspark==1.4.2
   - pyspark==3.0.2
   - pandas==1.2.4
   - pyarrow==4.0.0
+  - pynessie==0.5.1
 
 spark:
   tarball: https://downloads.apache.org/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz

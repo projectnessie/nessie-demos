@@ -16,14 +16,14 @@
 #
 """NessieDemo handles installing and, if necessary, downloading of dependencies for Nessie Demos."""
 import os
-import select
-import signal
 import stat
-import subprocess  # noqa: S404
 import sys
-import threading
-import time
-from subprocess import DEVNULL, TimeoutExpired  # noqa: S404
+from select import poll, POLLIN
+from signal import SIGKILL, SIGTERM
+from subprocess import DEVNULL, PIPE, Popen, STDOUT, TimeoutExpired  # noqa: S404
+from threading import Thread
+from time import sleep, time
+from types import TracebackType
 from typing import Any, BinaryIO, TypeVar
 
 import requests
@@ -40,7 +40,7 @@ class NessieDemo:
     __nessie_terminate_wait_seconds: float = 10.0
 
     __versions_yaml: str
-    __demos_root: str = "https://raw.githubusercontent.com/snazy/nessie-demos/main"
+    __demos_root: str
 
     __nessie_api_uri: str = "http://localhost:19120/api/v1"
 
@@ -48,19 +48,25 @@ class NessieDemo:
 
     __versions_dict: dict
 
-    __nessie_native_runner: str
-    __nessie_process: subprocess.Popen
+    __nessie_native_runner: list  # list[str]
+    __nessie_process: Popen
 
     __assets_dir: str
 
     __datasets: dict
 
+    __nessie_version: str
+    __iceberg_version: str
+
     def __init__(self: T, versions_yaml: str) -> None:
         """Takes the name of the versions-dictionary."""
-        self.__versions_yaml = versions_yaml
-
         if "NESSIE_DEMO_ROOT" in os.environ and len(os.environ["NESSIE_DEMO_ROOT"]) > 0:
             self.__demos_root = os.environ["NESSIE_DEMO_ROOT"]
+        else:
+            self.__demos_root = "https://raw.githubusercontent.com/snazy/nessie-demos/main"
+
+        self.__load_versions_yaml(versions_yaml)
+
         self.__assets_dir: str = (
             os.path.abspath(os.environ["NESSIE_DEMO_ASSETS"])
             if "NESSIE_DEMO_ASSETS" in os.environ and len(os.environ["NESSIE_DEMO_ASSETS"]) > 0
@@ -69,9 +75,37 @@ class NessieDemo:
 
         self.__datasets = dict()
 
-        versions_url = "{}/configs/{}".format(self.__demos_root, self.__versions_yaml)
+        self.__nessie_version = self.__versions_dict["versions"]["nessie"]
+        self.__iceberg_version = self.__versions_dict["versions"]["iceberg"]
 
-        self.__versions_dict = yaml.safe_load(_Util.curl(versions_url))
+    def __enter__(self: T) -> T:
+        """Starts Nessie."""
+        self.start()
+        return self
+
+    def __exit__(self: T, exc_type: type, exc_val: BaseException, exc_tb: TracebackType) -> None:
+        """Stops Nessie."""
+        self.stop()
+
+    def __load_versions_yaml(self: T, versions_yaml: str) -> None:
+        self.__versions_yaml = versions_yaml
+        if "://" in versions_yaml:
+            versions_url = versions_yaml
+        else:
+            versions_url = "{}/configs/{}".format(self.__demos_root, versions_yaml)
+
+        def __env_constructor(loader: yaml.Loader, node: yaml.Node) -> str:
+            env_var = node.value
+            if node.value not in os.environ:
+                raise Exception("Unknown environment variable '{}' referenced in {}".format(env_var, versions_url))
+            return os.environ[env_var]
+
+        yaml_loader = yaml.SafeLoader(_Util.curl(versions_url))
+        try:
+            yaml_loader.add_constructor("!env", __env_constructor)
+            self.__versions_dict = yaml_loader.get_single_data()
+        finally:
+            yaml_loader.dispose()
 
     def __str__(self: T) -> str:
         """String-ified representation."""
@@ -90,11 +124,11 @@ class NessieDemo:
 
     def get_nessie_version(self: T) -> str:
         """Get the Nessie version defined in the versions-dictionary."""
-        return self.__versions_dict["versions"]["nessie"]
+        return self.__nessie_version
 
     def get_iceberg_version(self: T) -> str:
         """Get the Iceberg version defined in the versions-dictionary."""
-        return self.__versions_dict["versions"]["iceberg"]
+        return self.__iceberg_version
 
     def __nessie_native_runner_url(self: T) -> str:
         nessie_native_runner_url = None
@@ -110,19 +144,34 @@ class NessieDemo:
             )
         return nessie_native_runner_url
 
+    def __prepare_nessie_runner(self: T) -> None:
+        if "nessie_runner" in self.__versions_dict:
+            runner = self.__versions_dict["nessie_runner"]
+            if isinstance(runner, str):
+                runner = [runner]
+            elif not isinstance(runner, list):
+                raise Exception("Optional YAML property 'nessie_runner' must be either a 'str' or a 'list[str]'")
+            if not os.path.exists(runner[0]) or os.stat(runner[0]).st_mode & stat.S_IXUSR != stat.S_IXUSR:
+                raise Exception("Optional YAML property 'nessie_runner' '{}', which is not an executable".format(" ".join(runner)))
+        else:
+            # Download nessie native runner binary
+            runner = [self._asset_dir("nessie-quarkus-{}-runner".format(self.get_nessie_version()))]
+
+            if not os.path.exists(runner[0]) or not os.stat(runner[0]).st_mode & stat.S_IXUSR == stat.S_IXUSR:
+                _Util.wget(self.__nessie_native_runner_url(), runner[0], executable=True)
+
+        self.__nessie_native_runner = runner
+
     def __prepare(self: T) -> None:
         # Install Python dependencies
         if "python_dependencies" in self.__versions_dict:
-            deps = self.__versions_dict["python_dependencies"]
-            _Util.exec_fail([sys.executable, "-m", "pip", "install"] + ["{}=={}".format(k, v) for k, v in deps.items()])
+            deps_list = self.__versions_dict["python_dependencies"]
+            _Util.exec_fail([sys.executable, "-m", "pip", "install"] + deps_list)
+        if "python_dependencies_reinstall" in self.__versions_dict:
+            deps_list = self.__versions_dict["python_dependencies_reinstall"]
+            _Util.exec_fail([sys.executable, "-m", "pip", "install", "--force-reinstall"] + deps_list)
 
-        # Download nessie native runner binary
-        self.__nessie_native_runner = self._asset_dir("nessie-quarkus-{}-runner".format(self.get_nessie_version()))
-
-        if os.path.exists(self.__nessie_native_runner) and os.stat(self.__nessie_native_runner).st_mode & stat.S_IXUSR == stat.S_IXUSR:
-            return
-
-        _Util.wget(self.__nessie_native_runner_url(), self.__nessie_native_runner, executable=True)
+        self.__prepare_nessie_runner()
 
     def _get_pid_file(self: T) -> str:
         return self._asset_dir("nessie.pid")
@@ -156,7 +205,7 @@ class NessieDemo:
         return self.__pid_from_file() > 0
 
     @staticmethod
-    def __process_watchdog(proc: subprocess.Popen, std_capt: BinaryIO) -> None:
+    def __process_watchdog(proc: Popen, std_capt: BinaryIO) -> None:
         def __watch_process() -> None:
             while True:
                 try:
@@ -170,7 +219,7 @@ class NessieDemo:
                     break
             std_capt.close()
 
-        comm_thread = threading.Thread(name="Comm Nessie PID {}".format(proc.pid), target=__watch_process, daemon=True)
+        comm_thread = Thread(name="Comm Nessie PID {}".format(proc.pid), target=__watch_process, daemon=True)
         comm_thread.start()
 
     def start(self: T) -> None:
@@ -197,10 +246,9 @@ class NessieDemo:
         log_file = self._asset_dir("nessie-runner-output.log")
         std_capt = open(log_file, "wb")
         try:
-            print("Starting Nessie...")
+            print("Starting Nessie {} ...".format(" ".join(self.__nessie_native_runner)))
 
-            runnable = self.__nessie_native_runner
-            self.__nessie_process = subprocess.Popen(runnable, stdin=DEVNULL, stdout=std_capt, stderr=std_capt)  # noqa: S603
+            self.__nessie_process = Popen(self.__nessie_native_runner, stdin=DEVNULL, stdout=std_capt, stderr=std_capt)  # noqa: S603
 
             self.__process_watchdog(self.__nessie_process, std_capt)
 
@@ -230,19 +278,20 @@ class NessieDemo:
         pid = self._get_pid()
         if pid > 0:
             print("Stopping Nessie ...")
-            timeout_at = time.time() + self.__nessie_terminate_wait_seconds
+            timeout_at = time() + self.__nessie_terminate_wait_seconds
             while True:
                 try:
-                    os.kill(pid, signal.SIGTERM)
-                    if time.time() > timeout_at:
+                    os.kill(pid, SIGTERM)
+                    if time() > timeout_at:
                         print("Running Nessie process with PID {} didn't react to SIGTERM, sending SIGKILL".format(pid))
-                        os.kill(pid, signal.SIGKILL)
-                    time.sleep(0.1)
+                        os.kill(pid, SIGKILL)
+                    sleep(0.1)
                 except OSError:
                     break
             print("Nessie stopped")
-        os.unlink(self._get_pid_file())
-        os.unlink(self._get_version_file())
+        for f in [self._get_pid_file(), self._get_version_file()]:
+            if os.path.exists(f):
+                os.unlink(f)
 
     def fetch_dataset(self: T, dataset_name: str) -> dict:  # dict[str, os.path]
         """Fetches a data set, a collection of files, for a demo.
@@ -295,10 +344,10 @@ class _Util:
     @staticmethod
     def exec_fail(args: list, cwd: str = None) -> None:  # noqa: C901
         print("Executing {} ...".format(" ".join(args)))
-        proc = subprocess.Popen(args, stdin=DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, cwd=cwd)  # noqa: S603
+        proc = Popen(args, stdin=DEVNULL, stdout=PIPE, stderr=STDOUT, text=True, cwd=cwd)  # noqa: S603
         stdout: Any = proc.stdout
-        poll_obj = select.poll()
-        poll_obj.register(stdout, select.POLLIN)
+        poll_obj = poll()
+        poll_obj.register(stdout, POLLIN)
         exit_code = None
         while True:
             poll_result = poll_obj.poll(0.1)
@@ -377,6 +426,7 @@ def setup_demo(versions_yaml: str, datasets: Any = None) -> NessieDemo:  # datas
         if __NESSIE_DEMO__.get_versions_yaml() == versions_yaml:
             # reuse the existing NessieDemo instance, if possible
             print("Reusing existing NessieDemo instance: {}".format(__NESSIE_DEMO__))
+            __NESSIE_DEMO__.start()
             return __NESSIE_DEMO__
         # stop the Nessie server (it's using a different Nessie version)
         print("Discarding existing NessieDemo instance: {}".format(__NESSIE_DEMO__))

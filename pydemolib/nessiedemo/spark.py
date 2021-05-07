@@ -25,6 +25,7 @@ have been installed, all Spark related code must be in a separate Python module 
 
 import os
 import re
+from types import TracebackType
 from typing import Any, Tuple, TypeVar
 
 import findspark  # NOTE: this module is INTENTIONALLY NOT included in requirements.txt
@@ -72,6 +73,14 @@ class NessieDemoSpark:
 
         findspark.init()
 
+    def __enter__(self: T) -> T:
+        """Noop."""
+        return self
+
+    def __exit__(self: T, exc_type: type, exc_val: BaseException, exc_tb: TracebackType) -> None:
+        """Disposes the SparkContext and calls `stop()` on the `NessieDemo` instance."""
+        self.dispose()
+
     def get_or_create_spark_context(self: T, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any]
         """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
 
@@ -86,7 +95,6 @@ class NessieDemoSpark:
         self.__jvm = self.__jvm_for_iceberg(self.__spark_context)
         print("Created SparkConf, SparkSession, SparkContext")
 
-        # TODO need a way to properly shutdown the spark-context (the pyspark-shell process)
         return self.__spark, self.__spark_context, self.__jvm
 
     def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
@@ -134,6 +142,31 @@ class NessieDemoSpark:
         new_session.conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
         return new_session
 
+    def dispose(self: T) -> None:
+        """Disposes the SparkContext and calls `stop()` on the `NessieDemo` instance."""
+        try:
+            spark_sess = self.__spark
+            print("Stopping SparkSession ...")
+            spark_sess.stop()
+            delattr(self, "__spark")
+            delattr(self, "__spark_context")
+            delattr(self, "__jvm")
+
+            SparkContext._active_spark_context.stop()
+            SparkContext._gateway.shutdown()
+            SparkContext._gateway = None
+            SparkContext._jvm = None
+        except AttributeError:
+            pass
+        try:
+            self.__demo.stop()
+            delattr(self, "__demo")
+        except AttributeError:
+            pass
+
+
+__NESSIE_SPARK_DEMO__ = None
+
 
 def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any, NessieDemoSpark]
     """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
@@ -143,7 +176,19 @@ def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tupl
     Can be a branch name, tag name or commit hash.
     :return: A 4-tuple of `SparkSession`, `SparkContext`, the JVM gateway and `NessieDemoSpark`
     """
+    global __NESSIE_SPARK_DEMO__
+    spark_dispose()
+
     demo_spark = NessieDemoSpark(demo)
+    __NESSIE_SPARK_DEMO__ = demo_spark
     spark, sc, jvm = demo_spark.get_or_create_spark_context(nessie_ref)
     # TODO need a way to properly shutdown the spark-context (the pyspark-shell process)
     return spark, sc, jvm, demo_spark
+
+
+def spark_dispose() -> None:
+    """Stops the SparkContext, if setup via `spark_for_demo`."""
+    global __NESSIE_SPARK_DEMO__
+    if __NESSIE_SPARK_DEMO__:
+        __NESSIE_SPARK_DEMO__.dispose()
+        __NESSIE_SPARK_DEMO__ = None
