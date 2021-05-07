@@ -85,6 +85,9 @@ class NessieDemo:
             nessie_running=run_info,
         )
 
+    def _asset_dir(self: T, name: str) -> str:
+        return os.path.join(self.__assets_dir, name)
+
     def get_nessie_version(self: T) -> str:
         """Get the Nessie version defined in the versions-dictionary."""
         return self.__versions_dict["versions"]["nessie"]
@@ -114,10 +117,7 @@ class NessieDemo:
             _Util.exec_fail([sys.executable, "-m", "pip", "install"] + ["{}=={}".format(k, v) for k, v in deps.items()])
 
         # Download nessie native runner binary
-        self.__nessie_native_runner = os.path.join(
-            self.__assets_dir,
-            "nessie-quarkus-{}-runner".format(self.get_nessie_version()),
-        )
+        self.__nessie_native_runner = self._asset_dir("nessie-quarkus-{}-runner".format(self.get_nessie_version()))
 
         if os.path.exists(self.__nessie_native_runner) and os.stat(self.__nessie_native_runner).st_mode & stat.S_IXUSR == stat.S_IXUSR:
             return
@@ -125,10 +125,10 @@ class NessieDemo:
         _Util.wget(self.__nessie_native_runner_url(), self.__nessie_native_runner, executable=True)
 
     def _get_pid_file(self: T) -> str:
-        return os.path.join(self.__assets_dir, "nessie.pid")
+        return self._asset_dir("nessie.pid")
 
     def _get_version_file(self: T) -> str:
-        return os.path.join(self.__assets_dir, "nessie.version")
+        return self._asset_dir("nessie.version")
 
     def __pid_from_file(self: T) -> int:
         pid_file = self._get_pid_file()
@@ -194,7 +194,7 @@ class NessieDemo:
 
         self.__prepare()
 
-        log_file = os.path.join(self.__assets_dir, "nessie-runner-output.log")
+        log_file = self._asset_dir("nessie-runner-output.log")
         std_capt = open(log_file, "wb")
         try:
             print("Starting Nessie...")
@@ -259,7 +259,7 @@ class NessieDemo:
 
         dataset_root = "{}/datasets/{}".format(self.__demos_root, dataset_name)
         contents = _Util.curl("{}/ls.txt".format(dataset_root)).decode("utf-8").split("\n")
-        dataset_dir = os.path.join(self.__assets_dir, "datasets/{}".format(dataset_name))
+        dataset_dir = self._asset_dir("datasets/{}".format(dataset_name))
         if not os.path.isdir(dataset_dir):
             os.makedirs(dataset_dir)
         name_to_path = dict()
@@ -281,10 +281,6 @@ class NessieDemo:
     def _get_versions_dict(self: T) -> dict:
         """Get the versions-dictionary retrieved from one of the config files in the `configs/` directory."""
         return self.__versions_dict
-
-    def _get_assets_dir(self: T) -> str:
-        """The directory used to store assets, which are the downloaded Nessie-Quarkus-Runners, Spark tarballs, datasets, etc."""
-        return self.__assets_dir
 
     def get_nessie_api_uri(self: T) -> str:
         """Get the Nessie server's API URL."""

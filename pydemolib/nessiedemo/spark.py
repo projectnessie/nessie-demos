@@ -44,7 +44,6 @@ class NessieDemoSpark:
     """
 
     __demo: NessieDemo
-    __assets_dir: str
 
     __spark: SparkSession
     __spark_context: SparkContext
@@ -53,7 +52,6 @@ class NessieDemoSpark:
     def __init__(self: T, demo: NessieDemo) -> None:
         """Creates a `NessieDemoSpark` instance for respectively using the given `NessieDemo` instance."""
         self.__demo = demo
-        self.__assets_dir = demo._get_assets_dir()
 
         spark_url = self.__demo._get_versions_dict()["spark"]["tarball"]
         # derive directory name inside the tarball from the URL
@@ -61,12 +59,12 @@ class NessieDemoSpark:
         if not m:
             raise Exception("Invalid Spark download URL {}".format(spark_url))
         dir_name = m.group(1)
-        spark_dir = os.path.join(self.__assets_dir, dir_name)
+        spark_dir = self.__demo._asset_dir(dir_name)
         if not os.path.exists(spark_dir):
-            tgz = os.path.join(self.__assets_dir, "{}.tgz".format(dir_name))
+            tgz = self.__demo._asset_dir("{}.tgz".format(dir_name))
             if not os.path.exists(tgz):
                 _Util.wget(spark_url, tgz)
-            _Util.exec_fail(["tar", "-x", "-C", self.__assets_dir, "-f", tgz])
+            _Util.exec_fail(["tar", "-x", "-C", os.path.abspath(os.path.join(spark_dir, "..")), "-f", tgz])
 
         print("Using Spark in {}".format(spark_dir))
 
@@ -94,7 +92,7 @@ class NessieDemoSpark:
     def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
         conf = SparkConf()
 
-        spark_warehouse = "file://{}/spark_warehouse".format(self.__demo._get_assets_dir())
+        spark_warehouse = "file://{}".format(self.__demo._asset_dir("spark_warehouse"))
         spark_jars = "org.apache.iceberg:iceberg-spark3-runtime:{}".format(self.__demo.get_iceberg_version())
 
         conf.set("spark.jars.packages", spark_jars)
