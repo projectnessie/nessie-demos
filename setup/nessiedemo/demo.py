@@ -6,6 +6,7 @@ import stat
 import subprocess  # noqa: S404
 import sys
 import time
+import threading
 from typing import Any, TypeVar
 
 import requests
@@ -18,7 +19,8 @@ T = TypeVar("T", bound="NessieDemo")
 class NessieDemo:
     """NessieDemo is the main setup and dependency handler for Nessie demos."""
 
-    __nessie_process_wait_seconds: float = 2.0
+    __nessie_start_wait_seconds: float = 2.0
+    __nessie_terminate_wait_seconds: float = 10.0
 
     __versions_yaml: str
     __demos_root: str = "https://raw.githubusercontent.com/snazy/nessie-demos/master"
@@ -70,10 +72,6 @@ class NessieDemo:
         """Get the Nessie version defined in the versions-dictionary."""
         return self.__versions_dict["versions"]["nessie"]
 
-    def get_pynessie_version(self: T) -> str:
-        """Get the pynessie version defined in the versions-dictionary."""
-        return self.__versions_dict["versions"]["pynessie"]
-
     def get_iceberg_version(self: T) -> str:
         """Get the Iceberg version defined in the versions-dictionary."""
         return self.__versions_dict["versions"]["iceberg"]
@@ -107,14 +105,14 @@ class NessieDemo:
 
         _Util.wget(nessie_native_runner_url, self.__nessie_native_runner, executable=True)
 
-    def __pid_file(self: T) -> str:
+    def _get_pid_file(self: T) -> str:
         return os.path.join(self.__assets_dir, "nessie.pid")
 
-    def __version_file(self: T) -> str:
+    def _get_version_file(self: T) -> str:
         return os.path.join(self.__assets_dir, "nessie.version")
 
     def __pid_from_file(self: T) -> int:
-        pid_file = self.__pid_file()
+        pid_file = self._get_pid_file()
         if not os.path.exists(pid_file):
             return -1
         with open(pid_file, "rb") as inp:
@@ -126,6 +124,11 @@ class NessieDemo:
                 return -1
             else:
                 return pid
+
+    def _get_pid(self: T) -> int:
+        if hasattr(self, "__nessie_process") and not self.__nessie_process.poll():
+            return self.__nessie_process.pid
+        return self.__pid_from_file()
 
     def is_nessie_running(self: T) -> bool:
         """Check whether a Nessie process is running."""
@@ -143,8 +146,8 @@ class NessieDemo:
 
         if self.is_nessie_running():
             # Nessie process is still alive, leave it running.
-            if os.path.exists(self.__version_file()):
-                with open(self.__version_file(), "rb") as inp:
+            if os.path.exists(self._get_version_file()):
+                with open(self._get_version_file(), "rb") as inp:
                     running_version = inp.read().decode("utf-8")
             else:
                 running_version = "UNKNOWN_VERSION"
@@ -160,54 +163,66 @@ class NessieDemo:
         try:
             print("Starting Nessie...")
 
-            self.__nessie_process = subprocess.Popen(self.__nessie_native_runner, stderr=std_capt, stdout=std_capt)  # noqa: S603
+            proc = subprocess.Popen(self.__nessie_native_runner, stdin=subprocess.DEVNULL, stdout=std_capt, stderr=std_capt)  # noqa: S603
+            self.__nessie_process = proc
 
-            with open(self.__pid_file(), "wb") as out:
-                out.write(str(self.__nessie_process.pid).encode("utf-8"))
-            with open(self.__version_file(), "wb") as out:
+            def watch_process():
+                while True:
+                    try:
+                        _, _ = proc.communicate(timeout=0.1)
+                        if proc.poll():
+                            break
+                    except subprocess.TimeoutExpired:
+                        pass
+                    except Exception:
+                        # There's not much we can do here
+                        break
+                std_capt.close()
+
+            comm_thread = threading.Thread(name="Comm Nessie PID {}".format(proc.pid), target=watch_process, daemon=True)
+            comm_thread.start()
+
+            with open(self._get_pid_file(), "wb") as out:
+                out.write(str(proc.pid).encode("utf-8"))
+            with open(self._get_version_file(), "wb") as out:
                 out.write(self.get_nessie_version().encode("utf-8"))
 
             try:
-                std_capt.close()
-                self.__nessie_process.wait(self.__nessie_process_wait_seconds)
-                with open("nessie-runner-output.log") as log:
+                proc.wait(self.__nessie_start_wait_seconds)
+                with open(log_file) as log:
                     log_lines = log.readlines()
                 raise Exception(
                     "Nessie process disappeared. Exit-code: {}, stdout/stderr:\n  {}".format(
-                        self.__nessie_process.returncode, "  ".join(log_lines)
+                        proc.returncode, "  ".join(log_lines)
                     )
                 )
             except subprocess.TimeoutExpired:
-                print("Nessie running with PID {}".format(self.__nessie_process.pid))
+                print("Nessie running with PID {}".format(proc.pid))
                 pass
         except Exception:
-            std_capt.close()
             os.unlink(log_file)
             raise
 
     def stop(self: T) -> None:
         """Stops a running Nessie process. This method is a no-op, if Nessie is not running."""
-        if hasattr(self, "__nessie_process"):
-            print("Stopping Nessie ...")
-            exit_code = self.__nessie_process.poll()
-            if not exit_code:
-                self.__nessie_process.terminate()
-                self.__nessie_process.wait()
-            print("Nessie stopped")
-        pid = self.__pid_from_file()
+        pid = self._get_pid()
         if pid > 0:
-            timeout_at = time.time() + 10
+            print("Stopping Nessie ...")
+            timeout_at = time.time() + self.__nessie_terminate_wait_seconds
             while True:
                 try:
                     os.kill(pid, signal.SIGTERM)
+                    t = time.time()
                     if time.time() > timeout_at:
                         print("Running Nessie process with PID {} didn't react to SIGTERM, sending SIGKILL".format(pid))
                         os.kill(pid, signal.SIGKILL)
+                        # TODO break
                     time.sleep(0.1)
                 except OSError:
                     break
-        os.unlink(self.__pid_file())
-        os.unlink(self.__version_file())
+            print("Nessie stopped")
+        os.unlink(self._get_pid_file())
+        os.unlink(self._get_version_file())
 
     def fetch_dataset(self: T, dataset_name: str) -> dict:  # dict[str, os.path]
         """Fetches a data set, a collection of files, for a demo.
@@ -264,7 +279,7 @@ class _Util:
     @staticmethod
     def exec_fail(args: list) -> None:
         print("Executing {} ...".format(" ".join(args)))
-        result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa: S603
+        result = subprocess.run(args, stdin=subprocess.DEVNULL)  # noqa: S603
         if result.returncode != 0:
             raise Exception(
                 "Executable failed. args: {}, stdout={}, stderr={}".format(
