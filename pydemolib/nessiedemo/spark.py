@@ -88,6 +88,7 @@ class NessieDemoSpark:
         self.__jvm = self.__jvm_for_iceberg(self.__spark_context)
         print("Created SparkConf, SparkSession, SparkContext")
 
+        # TODO need a way to properly shutdown the spark-context (the pyspark-shell process)
         return self.__spark, self.__spark_context, self.__jvm
 
     def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
@@ -146,4 +147,5 @@ def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tupl
     """
     demo_spark = NessieDemoSpark(demo)
     spark, sc, jvm = demo_spark.get_or_create_spark_context(nessie_ref)
+    # TODO need a way to properly shutdown the spark-context (the pyspark-shell process)
     return spark, sc, jvm, demo_spark
