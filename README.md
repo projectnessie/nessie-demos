@@ -1,5 +1,7 @@
 # Prototype repo to build demos for Nessie
 
+[![Main CI](https://github.com/snazy/nessie-demos/actions/workflows/main.yml/badge.svg)](https://github.com/snazy/nessie-demos/actions/workflows/main.yml)
+
 This git repo is a temporary repo, which will eventually be retired and maybe deleted. The results
 of this work will either go into the [Project Nessie repo](https://github.com/projectnessie/nessie/)
 or a separate repo under [Project Nessie](https://github.com/projectnessie/).
