@@ -60,9 +60,10 @@ class NessieDemoSpark:
         findspark.init()
 
     def get_or_create_spark_context(self: T, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any]
-        """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided `nessie_ref`.
+        """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
 
-        :param nessie_ref: the Nessie reference to configure in the `SparkConf`. Can be a branch name, tag name or commit hash.
+        :param nessie_ref: the Nessie reference as a `str` to configure in the `SparkConf`.
+        Can be a branch name, tag name or commit hash. Default is `main`.
         :return: A 3-tuple of `SparkSession`, `SparkContext` and the JVM gateway
         """
         print("Creating SparkConf, SparkSession, SparkContext ...")
@@ -76,15 +77,13 @@ class NessieDemoSpark:
 
     def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
         conf = SparkConf()
-        conf.set(
-            "spark.jars.packages",
-            "org.apache.iceberg:iceberg-spark3-runtime:{}".format(self.__demo.get_iceberg_version()),
-        )
+
+        spark_warehouse = "file://{}/spark_warehouse".format(self.__demo._get_assets_dir())
+        spark_jars = "org.apache.iceberg:iceberg-spark3-runtime:{}".format(self.__demo.get_iceberg_version())
+
+        conf.set("spark.jars.packages", spark_jars)
         conf.set("spark.sql.execution.pyarrow.enabled", "true")
-        conf.set(
-            "spark.sql.catalog.nessie.warehouse",
-            "file://{}/spark_warehouse".format(os.getcwd()),
-        )
+        conf.set("spark.sql.catalog.nessie.warehouse", spark_warehouse)
         conf.set("spark.sql.catalog.nessie.url", self.__demo.get_nessie_api_uri())
         conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
         conf.set(
@@ -123,9 +122,11 @@ class NessieDemoSpark:
 
 
 def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any, NessieDemoSpark]
-    """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided `nessie_ref`.
+    """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
 
-    :param nessie_ref: the Nessie reference to configure in the `SparkConf`. Can be a branch name, tag name or commit hash.
+    :param demo: `NessieDemo` instance to use.
+    :param nessie_ref: the Nessie reference as a `str` to configure in the `SparkConf`.
+    Can be a branch name, tag name or commit hash.
     :return: A 4-tuple of `SparkSession`, `SparkContext`, the JVM gateway and `NessieDemoSpark`
     """
     demo_spark = NessieDemoSpark(demo)
