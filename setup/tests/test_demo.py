@@ -11,7 +11,6 @@ import signal
 import pytest
 
 from nessiedemo.demo import NessieDemo, setup_demo
-from nessiedemo.spark import spark_for_demo
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -92,6 +91,9 @@ def test_setup_method() -> None:
 def test_with_spark() -> None:
     """Test NessieDemo plus NessieDemoSpark."""
     demo = setup_demo("nessie-0.5-iceberg-0.11.yml")
+
+    # Same with notebooks: must NOT import nessiedemo.spark BEFORE the demo's setup has "pip-install-ed" the spark dependencies
+    from nessiedemo.spark import spark_for_demo
 
     spark, sc, jvm, demo_spark = spark_for_demo(demo)
     assert spark.conf.get("spark.sql.catalog.nessie.ref") == "main"

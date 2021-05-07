@@ -12,10 +12,10 @@ import os
 import re
 from typing import Any, Tuple, TypeVar
 
-import findspark  # NOTE: this module is NOT included in requirements.txt
-from py4j.java_gateway import java_import  # NOTE: this module is NOT included in requirements.txt
-from pyspark import SparkConf, SparkContext  # NOTE: this module is NOT included in requirements.txt
-from pyspark.sql import SparkSession  # NOTE: this module is NOT included in requirements.txt
+import findspark  # NOTE: this module is INTENTIONALLY NOT included in requirements.txt
+from py4j.java_gateway import java_import  # NOTE: this module is INTENTIONALLY NOT included in requirements.txt
+from pyspark import SparkConf, SparkContext  # NOTE: this module is INTENTIONALLY NOT included in requirements.txt
+from pyspark.sql import SparkSession  # NOTE: this module is INTENTIONALLY NOT included in requirements.txt
 
 from .demo import _Util, NessieDemo
 
