@@ -39,7 +39,7 @@ class NessieDemo:
     __nessie_terminate_wait_seconds: float = 10.0
 
     __versions_yaml: str
-    __demos_root: str = "https://raw.githubusercontent.com/snazy/nessie-demos/master"
+    __demos_root: str = "https://raw.githubusercontent.com/snazy/nessie-demos/main"
 
     __nessie_api_uri: str = "http://localhost:19120/api/v1"
 
