@@ -16,6 +16,7 @@
 #
 """NessieDemo handles installing and, if necessary, downloading of dependencies for Nessie Demos."""
 import os
+import select
 import signal
 import stat
 import subprocess  # noqa: S404
@@ -296,30 +297,29 @@ class NessieDemo:
 
 class _Util:
     @staticmethod
-    def exec_fail(args: list) -> None:  # noqa: C901
+    def exec_fail(args: list, cwd: str = None) -> None:  # noqa: C901
         print("Executing {} ...".format(" ".join(args)))
-        proc = subprocess.Popen(args, stdin=DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, text=True)  # noqa: S603
+        proc = subprocess.Popen(args, stdin=DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, cwd=cwd)  # noqa: S603
+        stdout: Any = proc.stdout
+        poll_obj = select.poll()
+        poll_obj.register(stdout, select.POLLIN)
+        exit_code = None
         while True:
-            no_out = True
-            try:
-                for inp in [proc.stderr, proc.stdout]:
-                    if inp:
-                        rd = inp.read()
-                        if rd:
-                            print(str(rd))
-                            no_out = False
-            except TimeoutExpired:
-                pass
-            except Exception:
-                break
-            try:
-                exit_code = proc.poll()
-                if no_out and exit_code is not None:
-                    if exit_code != 0:
-                        raise Exception("Executable failed, exit-code={}. args: {}".format(exit_code, args))
+            poll_result = poll_obj.poll(0.1)
+            if poll_result:
+                line = stdout.readline()
+                sys.stdout.write(line)
+                if exit_code and len(line) == 0:
                     break
-            except OSError:
-                pass
+            if not exit_code:
+                try:
+                    exit_code = proc.poll()
+                    if exit_code is not None:
+                        if exit_code != 0:
+                            raise Exception("Executable failed, exit-code={}. args: {}".format(exit_code, args))
+                        break
+                except OSError:
+                    pass
 
     @staticmethod
     def wget(url: str, target: str, executable: bool = False) -> None:
