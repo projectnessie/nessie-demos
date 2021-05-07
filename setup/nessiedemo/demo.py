@@ -296,13 +296,30 @@ class _Util:
     @staticmethod
     def exec_fail(args: list) -> None:
         print("Executing {} ...".format(" ".join(args)))
-        result = subprocess.run(args, stdin=DEVNULL)  # noqa: S603
-        if result.returncode != 0:
-            raise Exception(
-                "Executable failed. args: {}, stdout={}, stderr={}".format(
-                    " ".join(result.args), result.stdout.decode("utf-8"), result.stderr.decode("utf-8")
-                )
-            )
+        proc = subprocess.Popen(args, stdin=DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, text=True)  # noqa: S603
+        while True:
+            no_out = True
+            try:
+                rd = proc.stderr.read()
+                if rd:
+                    print(str(rd))
+                    no_out = False
+                rd = proc.stdout.read()
+                if rd:
+                    print(str(rd))
+                    no_out = False
+            except TimeoutExpired:
+                pass
+            except Exception:
+                break
+            try:
+                exit_code = proc.poll()
+                if no_out and exit_code is not None:
+                    if exit_code != 0:
+                        raise Exception("Executable failed, exit-code={}. args: {}".format(exit_code, args))
+                    break
+            except OSError:
+                pass
 
     @staticmethod
     def wget(url: str, target: str, executable: bool = False) -> None:
