@@ -7,6 +7,7 @@ import subprocess  # noqa: S404
 import sys
 import threading
 import time
+from subprocess import DEVNULL, TimeoutExpired  # noqa: S404
 from typing import Any, BinaryIO, TypeVar
 
 import requests
@@ -144,7 +145,7 @@ class NessieDemo:
                     _, _ = proc.communicate(timeout=0.1)
                     if proc.poll():
                         break
-                except subprocess.TimeoutExpired:
+                except TimeoutExpired:
                     pass
                 except Exception:
                     # There's not much we can do here
@@ -160,8 +161,6 @@ class NessieDemo:
         A running Nessie process will only be stopped, if it is running a different Nessie version.
         Necessary Python dependencies will be installed, as defined in the versions-dictionary.
         """
-        self.__prepare()
-
         if self.is_nessie_running():
             # Nessie process is still alive, leave it running.
             if os.path.exists(self._get_version_file()):
@@ -175,15 +174,15 @@ class NessieDemo:
             else:
                 return
 
-        # TODO capture stdout+stderr using a daemon thread and pipe it to the notebook
+        self.__prepare()
+
         log_file = os.path.join(self.__assets_dir, "nessie-runner-output.log")
         std_capt = open(log_file, "wb")
         try:
             print("Starting Nessie...")
 
-            self.__nessie_process = subprocess.Popen(  # noqa: S603
-                self.__nessie_native_runner, stdin=subprocess.DEVNULL, stdout=std_capt, stderr=std_capt
-            )
+            runnable = self.__nessie_native_runner
+            self.__nessie_process = subprocess.Popen(runnable, stdin=DEVNULL, stdout=std_capt, stderr=std_capt)  # noqa: S603
 
             self.__process_watchdog(self.__nessie_process, std_capt)
 
@@ -201,7 +200,7 @@ class NessieDemo:
                         self.__nessie_process.returncode, "  ".join(log_lines)
                     )
                 )
-            except subprocess.TimeoutExpired:
+            except TimeoutExpired:
                 print("Nessie running with PID {}".format(self.__nessie_process.pid))
                 pass
         except Exception:
@@ -282,7 +281,7 @@ class _Util:
     @staticmethod
     def exec_fail(args: list) -> None:
         print("Executing {} ...".format(" ".join(args)))
-        result = subprocess.run(args, stdin=subprocess.DEVNULL)  # noqa: S603
+        result = subprocess.run(args, stdin=DEVNULL)  # noqa: S603
         if result.returncode != 0:
             raise Exception(
                 "Executable failed. args: {}, stdout={}, stderr={}".format(
@@ -298,7 +297,7 @@ class _Util:
                 if url.startswith("file://"):
                     with open(url[7:], "rb") as inp:
                         while True:
-                            chunk = inp.read(n=65536)
+                            chunk = inp.read(65536)
                             if len(chunk) == 0:
                                 break
                             f.write(chunk)
@@ -335,7 +334,7 @@ class _Util:
 __NESSIE_DEMO__ = None
 
 
-def setup_demo(versions_yaml: str, datasets: Any) -> NessieDemo:  # datasets: list[str]  or  str
+def setup_demo(versions_yaml: str, datasets: Any = None) -> NessieDemo:  # datasets: list[str]  or  str
     """Sets up and starts a `NessieDemo` instance.
 
     It uses the versions-dictionary identified by `versions_yaml`, fetches the datasets mentioned in the

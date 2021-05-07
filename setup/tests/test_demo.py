@@ -7,7 +7,7 @@ import signal
 
 import pytest
 
-from nessiedemo.demo import NessieDemo
+from nessiedemo.demo import NessieDemo, setup_demo
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -45,6 +45,14 @@ def test_new_instance_can_kill_nessie() -> None:
     assert demo.get_iceberg_version() == "0.11.1"
     assert demo._get_versions_dict()["python_dependencies"]["pyspark"] == "3.0.2"
 
+    ds_nba = demo.fetch_dataset("nba")
+    assert len(ds_nba) == 3
+    for k, v in ds_nba.items():
+        source_file = os.path.join(os.environ["NESSIE_DEMO_ROOT"][7:], "datasets", "nba", k)
+        assert source_file != v
+        assert os.path.exists(v)
+        assert os.path.getsize(v) == os.path.getsize(source_file)
+
     demo.start()
     assert demo.is_nessie_running()
     pid = demo._get_pid()
@@ -62,3 +70,16 @@ def test_new_instance_can_kill_nessie() -> None:
     demo2 = NessieDemo("nessie-0.5-iceberg-0.11.yml")
     pid2 = demo2._get_pid()
     assert pid == pid2
+
+    ds_nba2 = demo2.fetch_dataset("nba")
+    assert ds_nba == ds_nba2
+
+
+def test_setup_method() -> None:
+    """Test the convenience nessiedemo.demo.setup_demo()."""
+    demo = setup_demo("nessie-0.5-iceberg-0.11.yml")
+    demo2 = setup_demo("nessie-0.5-iceberg-0.11.yml", "nba")
+    demo3 = setup_demo("nessie-0.5-iceberg-0.11.yml", ["nba", "region-nation"])
+
+    assert demo2 is demo
+    assert demo3 is demo
