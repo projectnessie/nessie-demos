@@ -212,11 +212,9 @@ class NessieDemo:
             while True:
                 try:
                     os.kill(pid, signal.SIGTERM)
-                    t = time.time()
                     if time.time() > timeout_at:
                         print("Running Nessie process with PID {} didn't react to SIGTERM, sending SIGKILL".format(pid))
                         os.kill(pid, signal.SIGKILL)
-                        # TODO break
                     time.sleep(0.1)
                 except OSError:
                     break
