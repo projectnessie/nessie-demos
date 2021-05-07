@@ -14,15 +14,16 @@
 # limitations under the License.
 #
 
-name: Main CI
+name: nessiedemo
 
 on:
   push:
     branches: [ main ]
+  pull_request:
 
 jobs:
   python:
-    name: nessiedemo package
+    name: tox
     runs-on: ubuntu-latest
     env:
       working-directory: ./pydemolib
