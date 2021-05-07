@@ -294,20 +294,18 @@ class NessieDemo:
 
 class _Util:
     @staticmethod
-    def exec_fail(args: list) -> None:
+    def exec_fail(args: list) -> None:  # noqa: C901
         print("Executing {} ...".format(" ".join(args)))
         proc = subprocess.Popen(args, stdin=DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, bufsize=1, text=True)  # noqa: S603
         while True:
             no_out = True
             try:
-                rd = proc.stderr.read()
-                if rd:
-                    print(str(rd))
-                    no_out = False
-                rd = proc.stdout.read()
-                if rd:
-                    print(str(rd))
-                    no_out = False
+                for inp in [proc.stderr, proc.stdout]:
+                    if inp:
+                        rd = inp.read()
+                        if rd:
+                            print(str(rd))
+                            no_out = False
             except TimeoutExpired:
                 pass
             except Exception:
