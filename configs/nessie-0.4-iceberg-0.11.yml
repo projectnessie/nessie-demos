@@ -1,6 +1,5 @@
 versions:
   nessie: 0.4.0
-  pynessie: 0.4.0
   iceberg: 0.11.1
 
 python_dependencies:
