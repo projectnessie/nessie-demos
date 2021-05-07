@@ -92,6 +92,20 @@ class NessieDemo:
         """Get the Iceberg version defined in the versions-dictionary."""
         return self.__versions_dict["versions"]["iceberg"]
 
+    def __nessie_native_runner_url(self: T) -> str:
+        nessie_native_runner_url = None
+        try:
+            nessie_native_runner_url = self.__versions_dict["uris"]["nessie_native_image_binary"]
+        except KeyError:
+            pass
+        if not nessie_native_runner_url:
+            nessie_native_runner_url = "{}/nessie-{}/nessie-quarkus-{}-runner".format(
+                self.__native_runner_root,
+                self.get_nessie_version(),
+                self.get_nessie_version(),
+            )
+        return nessie_native_runner_url
+
     def __prepare(self: T) -> None:
         # Install Python dependencies
         if "python_dependencies" in self.__versions_dict:
@@ -107,19 +121,7 @@ class NessieDemo:
         if os.path.exists(self.__nessie_native_runner) and os.stat(self.__nessie_native_runner).st_mode & stat.S_IXUSR == stat.S_IXUSR:
             return
 
-        nessie_native_runner_url = None
-        try:
-            nessie_native_runner_url = self.__versions_dict["uris"]["nessie_native_image_binary"]
-        except KeyError:
-            pass
-        if not nessie_native_runner_url:
-            nessie_native_runner_url = "{}/nessie-{}/nessie-quarkus-{}-runner".format(
-                self.__native_runner_root,
-                self.get_nessie_version(),
-                self.get_nessie_version(),
-            )
-
-        _Util.wget(nessie_native_runner_url, self.__nessie_native_runner, executable=True)
+        _Util.wget(self.__nessie_native_runner_url(), self.__nessie_native_runner, executable=True)
 
     def _get_pid_file(self: T) -> str:
         return os.path.join(self.__assets_dir, "nessie.pid")
