@@ -19,6 +19,16 @@ similar restrictions/requirements as the demos.
 
 Every demo must work, we want to eliminate manual testing, so all demos must be unit-testable.
 
+## Directory structure
+
+| directory | purpose |
+| --------- | ------- |
+| `colab/` | Contains unit-testable Jupyter notebooks that can run in Google Colaboratory and Binder.
+| `pydemolib/` | Python library that helps to eliminate nearly all boilerplate code in Jupyter notebook based demos.
+| `configs/` | Configuration files that define Nessie, Iceberg, Spark versions and dependencies, supporting demos using different product versions.
+| `datasets/` | Various datasets that can be used by the demos. The nessiedemo Python library in `pydemolib/` supports downloading and accessing these datasets.
+| `/` | Also contains `apt.txt` + `requirements.txt` used by Binder. This `requirements.txt` has nothing to do with the `requirements.txt` in `pydemolib/`.
+
 ## Jupyter notebook environments
 
 ### Google Colaboratory
@@ -53,9 +63,9 @@ dependencies, because of dependency issues in the hosted runtime of Colaboratory
 
 Different demos probably require different dependencies, like different versions of Apache Spark,
 of Apache Iceberg, of Nessie, etc. This is why the set of dependencies in
-[`requirements.txt`](setup/requirements.txt) is pretty short and quite relaxed.
+[`requirements.txt`](pydemolib/requirements.txt) is pretty short and quite relaxed.
 
-Config files in the `configs/` directory contain various sets of dependencies. The nessiedemo-setup
+Config files in the `configs/` directory contain various sets of dependencies. The `pydemolib`
 code takes care or installing the Python dependencies, Apache Spark and the nessie-runner.
 
 It shall also be possible to run (or at least test) the demos against non-released versions
@@ -64,7 +74,7 @@ of Nessie and Iceberg, if that's possible "without a ton of code and complexity"
 ## Datasets for demos
 
 Since some notebooks environments like Google Colaboratory only support uploading a single `.ipynb`
-file, which cannot access "files next to it", the nessiedemo-setup code allows downloading
+file, which cannot access "files next to it", the `pydemolib` code allows downloading
 named datasets to the local file system. Files in a dataset can then be identified by name via a
 Python `dict`.
 
