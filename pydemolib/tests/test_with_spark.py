@@ -76,10 +76,10 @@ class TestWithSpark:
 
         catalog = jvm.CatalogUtil.loadCatalog(
             "org.apache.iceberg.nessie.NessieCatalog",
-            "nessie",
+            "test_with_spark",
             {
                 "ref": "dev",
-                "uri": demo.get_nessie_api_uri(),
+                "uri": demo.get_nessie_api_uri(),  # TODO remove this one once Nessie PR#1211 is merged
                 "url": demo.get_nessie_api_uri(),
                 "warehouse": "file://" + demo._asset_dir("spark_warehouse"),
             },
@@ -101,7 +101,7 @@ class TestWithSpark:
 
         catalog.createTable(region_name, region_schema, region_spec)
         region_df = spark_dev.read.load(dataset["region.parquet"])
-        region_df.write.format("iceberg").mode("overwrite").save("nessie.testing.region")
+        region_df.write.format("iceberg").mode("overwrite").save("test_with_spark.testing.region")
 
     def test_with_spark(self: object) -> None:
         """Test NessieDemo+Spark against Nessie 0.5.x + Iceberg 0.11.x."""

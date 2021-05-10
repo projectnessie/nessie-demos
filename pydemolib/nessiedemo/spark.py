@@ -81,6 +81,9 @@ class NessieDemoSpark:
         """Disposes the SparkContext and calls `stop()` on the `NessieDemo` instance."""
         self.dispose()
 
+    def get_spark_warehouse(self: T) -> str:
+        return "file://{}".format(self.__demo._asset_dir("spark_warehouse"))
+
     def get_or_create_spark_context(self: T, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any]
         """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
 
@@ -100,13 +103,14 @@ class NessieDemoSpark:
     def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
         conf = SparkConf()
 
-        spark_warehouse = "file://{}".format(self.__demo._asset_dir("spark_warehouse"))
         spark_jars = "org.apache.iceberg:iceberg-spark3-runtime:{}".format(self.__demo.get_iceberg_version())
+        endpoint = self.__demo.get_nessie_api_uri()
 
         conf.set("spark.jars.packages", spark_jars)
         conf.set("spark.sql.execution.pyarrow.enabled", "true")
-        conf.set("spark.sql.catalog.nessie.warehouse", spark_warehouse)
-        conf.set("spark.sql.catalog.nessie.url", self.__demo.get_nessie_api_uri())
+        conf.set("spark.sql.catalog.nessie.warehouse", self.get_spark_warehouse())
+        conf.set("spark.sql.catalog.nessie.uri", endpoint)  # TODO remove this one once Nessie PR#1211 is merged
+        conf.set("spark.sql.catalog.nessie.url", endpoint)
         conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
         conf.set(
             "spark.sql.catalog.nessie.catalog-impl",
