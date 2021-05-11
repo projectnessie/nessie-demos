@@ -60,16 +60,16 @@ class TestWithSpark:
         # Same with notebooks: must NOT import nessiedemo.spark BEFORE the demo's setup has "pip-install-ed" the spark dependencies
         from nessiedemo.spark import spark_for_demo
 
-        spark, sc, jvm, demo_spark = spark_for_demo(demo)
-        assert spark.conf.get("spark.sql.catalog.nessie.ref") == "main"
-        assert spark.conf.get("spark.sql.catalog.nessie.url") == demo.get_nessie_api_uri()
+        spark, sc, jvm, demo_spark = spark_for_demo(demo, catalog_name="test_with_spark")
+        assert spark.conf.get("spark.sql.catalog.test_with_spark.ref") == "main"
+        assert spark.conf.get("spark.sql.catalog.test_with_spark.url") == demo.get_nessie_api_uri()
         assert spark.conf.get("spark.jars.packages") == "org.apache.iceberg:iceberg-spark3-runtime:" + demo.get_iceberg_version()
         assert sc is not None
         assert jvm is not None
 
-        spark_dev = demo_spark.session_for_ref("dev")
-        assert spark_dev.conf.get("spark.sql.catalog.nessie.ref") == "dev"
-        assert spark_dev.conf.get("spark.sql.catalog.nessie.url") == demo.get_nessie_api_uri()
+        spark_dev = demo_spark.session_for_ref("dev", catalog_name="test_with_spark")
+        assert spark_dev.conf.get("spark.sql.catalog.test_with_spark.ref") == "dev"
+        assert spark_dev.conf.get("spark.sql.catalog.test_with_spark.url") == demo.get_nessie_api_uri()
         assert spark_dev.conf.get("spark.jars.packages") == "org.apache.iceberg:iceberg-spark3-runtime:" + demo.get_iceberg_version()
 
         run(["nessie", "branch", "dev"])  # noqa: S603 S607

@@ -82,17 +82,19 @@ class NessieDemoSpark:
         self.dispose()
 
     def get_spark_warehouse(self: T) -> str:
+        """Get the path to for the 'Spark Warehouse'."""
         return "file://{}".format(self.__demo._asset_dir("spark_warehouse"))
 
-    def get_or_create_spark_context(self: T, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any]
+    def get_or_create_spark_context(self: T, nessie_ref: str = "main", catalog_name: str = "nessie") -> Tuple:
         """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
 
         :param nessie_ref: the Nessie reference as a `str` to configure in the `SparkConf`.
         Can be a branch name, tag name or commit hash. Default is `main`.
+        :param catalog_name: Name of the catalog, defaults to `nessie`.
         :return: A 3-tuple of `SparkSession`, `SparkContext` and the JVM gateway
         """
         print("Creating SparkConf, SparkSession, SparkContext ...")
-        conf = self.__spark_conf(nessie_ref)
+        conf = self.__spark_conf(nessie_ref, catalog_name)
         self.__spark = SparkSession.builder.config(conf=conf).getOrCreate()
         self.__spark_context = self.__spark.sparkContext
         self.__jvm = self.__jvm_for_iceberg(self.__spark_context)
@@ -100,7 +102,7 @@ class NessieDemoSpark:
 
         return self.__spark, self.__spark_context, self.__jvm
 
-    def __spark_conf(self: T, nessie_ref: str = "main") -> SparkConf:
+    def __spark_conf(self: T, nessie_ref: str = "main", catalog_name: str = "nessie") -> SparkConf:
         conf = SparkConf()
 
         spark_jars = "org.apache.iceberg:iceberg-spark3-runtime:{}".format(self.__demo.get_iceberg_version())
@@ -108,16 +110,16 @@ class NessieDemoSpark:
 
         conf.set("spark.jars.packages", spark_jars)
         conf.set("spark.sql.execution.pyarrow.enabled", "true")
-        conf.set("spark.sql.catalog.nessie.warehouse", self.get_spark_warehouse())
-        conf.set("spark.sql.catalog.nessie.url", endpoint)
-        conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
+        conf.set("spark.sql.catalog.{}.warehouse".format(catalog_name), self.get_spark_warehouse())
+        conf.set("spark.sql.catalog.{}.url".format(catalog_name), endpoint)
+        conf.set("spark.sql.catalog.{}.ref".format(catalog_name), nessie_ref)
         conf.set(
-            "spark.sql.catalog.nessie.catalog-impl",
+            "spark.sql.catalog.{}.catalog-impl".format(catalog_name),
             "org.apache.iceberg.nessie.NessieCatalog",
         )
-        conf.set("spark.sql.catalog.nessie.auth_type", "NONE")
-        conf.set("spark.sql.catalog.nessie.cache-enabled", "false")
-        conf.set("spark.sql.catalog.nessie", "org.apache.iceberg.spark.SparkCatalog")
+        conf.set("spark.sql.catalog.{}.auth_type".format(catalog_name), "NONE")
+        conf.set("spark.sql.catalog.{}.cache-enabled".format(catalog_name), "false")
+        conf.set("spark.sql.catalog.{}".format(catalog_name), "org.apache.iceberg.spark.SparkCatalog")
         conf.set(
             "spark.sql.catalog.spark_catalog",
             "org.apache.iceberg.spark.SparkSessionCatalog",
@@ -135,14 +137,14 @@ class NessieDemoSpark:
 
         return jvm
 
-    def session_for_ref(self: T, nessie_ref: str) -> SparkSession:
+    def session_for_ref(self: T, nessie_ref: str, catalog_name: str = "nessie") -> SparkSession:
         """Retrieve a new `SparkSession` ready to use against the given Nessie reference.
 
         :param nessie_ref: the Nessie reference to configure in the `SparkConf`. Can be a branch name, tag name or commit hash.
         :return: new `SparkSession`
         """
         new_session = self.__spark.newSession()
-        new_session.conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
+        new_session.conf.set("spark.sql.catalog.{}.ref".format(catalog_name), nessie_ref)
         return new_session
 
     def dispose(self: T) -> None:
@@ -171,12 +173,13 @@ class NessieDemoSpark:
 __NESSIE_SPARK_DEMO__ = None
 
 
-def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tuple[SparkSession, SparkContext, Any, NessieDemoSpark]
+def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main", catalog_name: str = "nessie") -> Tuple:
     """Sets up the `SparkConf`, `SparkSession` and `SparkContext` ready to use for the provided/default `nessie_ref`.
 
     :param demo: `NessieDemo` instance to use.
     :param nessie_ref: the Nessie reference as a `str` to configure in the `SparkConf`.
     Can be a branch name, tag name or commit hash.
+    :param catalog_name: Name of the catalog, defaults to `nessie`.
     :return: A 4-tuple of `SparkSession`, `SparkContext`, the JVM gateway and `NessieDemoSpark`
     """
     global __NESSIE_SPARK_DEMO__
@@ -184,7 +187,7 @@ def spark_for_demo(demo: NessieDemo, nessie_ref: str = "main") -> Tuple:  # Tupl
 
     demo_spark = NessieDemoSpark(demo)
     __NESSIE_SPARK_DEMO__ = demo_spark
-    spark, sc, jvm = demo_spark.get_or_create_spark_context(nessie_ref)
+    spark, sc, jvm = demo_spark.get_or_create_spark_context(nessie_ref=nessie_ref, catalog_name=catalog_name)
     # TODO need a way to properly shutdown the spark-context (the pyspark-shell process)
     return spark, sc, jvm, demo_spark
 
