@@ -63,7 +63,7 @@ class NessieDemo:
         if "NESSIE_DEMO_ROOT" in os.environ and len(os.environ["NESSIE_DEMO_ROOT"]) > 0:
             self.__demos_root = os.environ["NESSIE_DEMO_ROOT"]
         else:
-            self.__demos_root = "https://raw.githubusercontent.com/snazy/nessie-demos/main"
+            self.__demos_root = "https://raw.githubusercontent.com/projectnessie/nessie-demos/main"
 
         self.__load_versions_yaml(versions_yaml)
 
