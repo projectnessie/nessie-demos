@@ -79,7 +79,6 @@ class TestWithSpark:
             "test_with_spark",
             {
                 "ref": "dev",
-                "uri": demo.get_nessie_api_uri(),  # TODO remove this one once Nessie PR#1211 is merged
                 "url": demo.get_nessie_api_uri(),
                 "warehouse": "file://" + demo._asset_dir("spark_warehouse"),
             },

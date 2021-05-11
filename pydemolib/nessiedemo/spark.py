@@ -109,7 +109,6 @@ class NessieDemoSpark:
         conf.set("spark.jars.packages", spark_jars)
         conf.set("spark.sql.execution.pyarrow.enabled", "true")
         conf.set("spark.sql.catalog.nessie.warehouse", self.get_spark_warehouse())
-        conf.set("spark.sql.catalog.nessie.uri", endpoint)  # TODO remove this one once Nessie PR#1211 is merged
         conf.set("spark.sql.catalog.nessie.url", endpoint)
         conf.set("spark.sql.catalog.nessie.ref", nessie_ref)
         conf.set(
