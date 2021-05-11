@@ -134,17 +134,26 @@ class NessieDemoSpark:
         java_import(jvm, "org.apache.iceberg.Schema")
         java_import(jvm, "org.apache.iceberg.types.Types")
         java_import(jvm, "org.apache.iceberg.PartitionSpec")
+        java_import(jvm, "org.apache.spark.SparkContext")
+        java_import(jvm, "org.apache.spark.sql.SparkSession")
 
         return jvm
 
     def session_for_ref(self: T, nessie_ref: str, catalog_name: str = "nessie") -> SparkSession:
         """Retrieve a new `SparkSession` ready to use against the given Nessie reference.
 
+        Note: when you use multiple `SparkSession`s in your notebook/demo, make sure you always call this method
+        to "switch the branch".
+
         :param nessie_ref: the Nessie reference to configure in the `SparkConf`. Can be a branch name, tag name or commit hash.
         :return: new `SparkSession`
         """
         new_session = self.__spark.newSession()
         new_session.conf.set("spark.sql.catalog.{}.ref".format(catalog_name), nessie_ref)
+
+        # Required with Spark 3.1
+        self.__jvm.SparkSession.setActiveSession(new_session._jsparkSession)
+
         return new_session
 
     def dispose(self: T) -> None:

@@ -37,10 +37,10 @@ versions:
 
 python_dependencies:
   - findspark==1.4.2
-  - pyspark==3.0.2
+  - pyspark==3.1.1
   - pandas==1.2.4
   - pyarrow==4.0.0
   - pynessie==0.5.1
 
 spark:
-  tarball: https://downloads.apache.org/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz
+  tarball: https://downloads.apache.org/spark/spark-3.1.1/spark-3.1.1-bin-hadoop2.7.tgz

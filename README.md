@@ -134,9 +134,6 @@ i.e. a linear git history (no merges, no branches, PR-squash-and-merge).
 
 ## Compatibility Matrix
 
-| Current | Nessie | Apache Iceberg | Apache Spark | Notes
-| ------- | ------ | -------------- | ------------ | -----
-| No |0.4.0 | 0.11.1 | 3.0 | Iceberg declares Nessie 0.3.0, but there are no (REST)API changes between Nessie 0.3.0 and 0.4.0
-| **Yes** |0.5.1 | 0.11.1 | 3.0 | Iceberg declares Nessie 0.3.0, but there are no _breaking_ (REST)API changes between Nessie 0.4.0 and 0.5.1
-| No |0.5.1 | (recent HEAD of `master` branch) | 3.0 |
-| No |(recent HEAD of `main` branch) | n/a | n/a | **incompatible**, would require a build from a developer's branch
+| Nessie | Apache Iceberg | Apache Spark | Notes
+| ------ | -------------- | ------------ | -----
+| 0.5.1  | 0.11.1         | 3.0          | Iceberg declares Nessie 0.3.0, but there are no _breaking_ (REST)API changes between Nessie 0.4.0 and 0.5.1

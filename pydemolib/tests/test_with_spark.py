@@ -80,7 +80,7 @@ class TestWithSpark:
             {
                 "ref": "dev",
                 "url": demo.get_nessie_api_uri(),
-                "warehouse": "file://" + demo._asset_dir("spark_warehouse"),
+                "warehouse": demo_spark.get_spark_warehouse(),
             },
             sc._jsc.hadoopConfiguration(),
         )
