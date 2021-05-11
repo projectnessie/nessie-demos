@@ -1,0 +1,1 @@
+This dataset was taken from https://www.kaggle.com/xvivancos/michael-jordan-kobe-bryant-and-lebron-james-stats and modified to the needs of Nessie Demos
