@@ -19,6 +19,7 @@
 import os
 from subprocess import run  # noqa: S404
 
+import pytest
 from pytest import fixture, skip
 
 from nessiedemo.demo import setup_demo
@@ -102,14 +103,17 @@ class TestWithSpark:
         region_df = spark_dev.read.load(dataset["region.parquet"])
         region_df.write.format("iceberg").mode("overwrite").save("test_with_spark.testing.region")
 
+    @pytest.mark.forked
     def test_with_spark(self: object) -> None:
         """Test NessieDemo+Spark against Nessie 0.5.x + Iceberg 0.11.x."""
         TestWithSpark.__test_with_spark("nessie-0.5-iceberg-0.11.yml", [])
 
+    @pytest.mark.forked
     def test_with_spark_iceberg_in_dev(self: object) -> None:
         """Test NessieDemo+Spark against an in-development version of Iceberg built locally from source."""
         TestWithSpark.__test_with_spark("in-development-iceberg.yml", ["NESSIE_DEMO_IN_DEV_ICEBERG_VERSION"])
 
+    @pytest.mark.forked
     def test_with_spark_nessie_in_dev(self: object) -> None:
         """Test NessieDemo+Spark against an in-development version of Nessie built locally from source."""
         TestWithSpark.__test_with_spark(
@@ -121,6 +125,7 @@ class TestWithSpark:
             ],
         )
 
+    @pytest.mark.forked
     def test_with_spark_nessie_iceberg_in_dev(self: object) -> None:
         """Test NessieDemo+Spark against an in-development version of Nessie built locally from source."""
         TestWithSpark.__test_with_spark(
