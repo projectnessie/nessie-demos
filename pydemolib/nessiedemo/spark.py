@@ -25,7 +25,7 @@ have been installed, all Spark related code must be in a separate Python module 
 
 import os
 import re
-import sysconfig;
+import sysconfig
 from types import TracebackType
 from typing import Any, Tuple, TypeVar
 
