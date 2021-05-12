@@ -17,10 +17,13 @@
 #
 """Utilities for tests."""
 import os
+import sys
 from signal import SIGKILL
+from typing import Callable
 
 from _pytest.fixtures import FixtureRequest
 from _pytest.tmpdir import TempdirFactory
+from pytest import fail
 
 
 def demo_setup_fixture_for_tests(tmpdir_factory: TempdirFactory, request: FixtureRequest) -> None:
@@ -51,3 +54,17 @@ def demo_setup_fixture_for_tests(tmpdir_factory: TempdirFactory, request: Fixtur
                     pass
 
     request.addfinalizer(__kill_running_nessie)
+
+
+def expect_error(expected_exception_type: str, f: Callable) -> None:
+    """Calls the given function `f` and asserts that the fully qualified name of the thrown exception matches `expected_exception_type`."""
+    passed = False
+    try:
+        f()
+        passed = True
+    except BaseException:
+        ex_type, ex_value, ex_tb = sys.exc_info()
+        # We don't really have that type here (comes in transitively)
+        assert "{}.{}".format(ex_type.__module__, ex_type.__name__) == expected_exception_type
+    if passed:
+        fail("Callable passed but should have thrown '{}'".format(expected_exception_type))

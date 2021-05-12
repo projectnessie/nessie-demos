@@ -27,13 +27,10 @@ from signal import SIGKILL, SIGTERM
 from subprocess import DEVNULL, PIPE, Popen, STDOUT, TimeoutExpired  # noqa: S404
 from time import sleep, time
 from types import TracebackType
-from typing import Any, TypeVar, Union
+from typing import Any, Union
 
 import requests
 import yaml
-
-
-T = TypeVar("T", bound="NessieDemo")
 
 
 class NessieDemo:
@@ -63,7 +60,7 @@ class NessieDemo:
 
     pip_install_verbose: bool = False
 
-    def __init__(self: T, versions_yaml: str) -> None:
+    def __init__(self: "NessieDemo", versions_yaml: str) -> None:
         """Takes the name of the versions-dictionary."""
         if "NESSIE_DEMO_ROOT" in os.environ and len(os.environ["NESSIE_DEMO_ROOT"]) > 0:
             self.__demos_root = os.environ["NESSIE_DEMO_ROOT"]
@@ -83,18 +80,18 @@ class NessieDemo:
         self.__datasets = dict()
 
         self.__nessie_version = self.__versions_dict["versions"]["nessie"]
-        self.__iceberg_version = self.__versions_dict["versions"]["iceberg"]
+        self.__iceberg_version = self.__versions_dict["versions"]["iceberg"] if "iceberg" in self.__versions_dict["versions"] else ""
 
-    def __enter__(self: T) -> T:
+    def __enter__(self: "NessieDemo") -> "NessieDemo":
         """Starts Nessie."""
         self.start()
         return self
 
-    def __exit__(self: T, exc_type: type, exc_val: BaseException, exc_tb: TracebackType) -> None:
+    def __exit__(self: "NessieDemo", exc_type: type, exc_val: BaseException, exc_tb: TracebackType) -> None:
         """Stops Nessie."""
         self.stop()
 
-    def __load_versions_yaml(self: T, versions_yaml: str) -> None:
+    def __load_versions_yaml(self: "NessieDemo", versions_yaml: str) -> None:
         self.__versions_yaml = versions_yaml
         if "://" in versions_yaml:
             versions_url = versions_yaml
@@ -114,30 +111,30 @@ class NessieDemo:
         finally:
             yaml_loader.dispose()
 
-    def __str__(self: T) -> str:
+    def __str__(self: "NessieDemo") -> str:
         """String-ified representation."""
         if self.is_nessie_running():
             run_info = "RUNNING, PID {}".format(self.__pid_from_file())
         else:
             run_info = "not running"
-        return "Nessie-Demo: Nessie {nessie_version} ({nessie_running}), Apache Iceberg {iceberg_version}".format(
+        return "Nessie-Demo: Nessie {nessie_version} ({nessie_running}),{iceberg_version}".format(
             nessie_version=self.get_nessie_version(),
-            iceberg_version=self.get_iceberg_version(),
+            iceberg_version=" Apache Iceberg {}".format(self.get_iceberg_version()) if len(self.get_iceberg_version()) > 0 else "",
             nessie_running=run_info,
         )
 
-    def _asset_dir(self: T, name: str) -> str:
+    def _asset_dir(self: "NessieDemo", name: str) -> str:
         return os.path.join(self.__assets_dir, name)
 
-    def get_nessie_version(self: T) -> str:
+    def get_nessie_version(self: "NessieDemo") -> str:
         """Get the Nessie version defined in the versions-dictionary."""
         return self.__nessie_version
 
-    def get_iceberg_version(self: T) -> str:
+    def get_iceberg_version(self: "NessieDemo") -> str:
         """Get the Iceberg version defined in the versions-dictionary."""
         return self.__iceberg_version
 
-    def __nessie_native_runner_url(self: T) -> str:
+    def __nessie_native_runner_url(self: "NessieDemo") -> str:
         nessie_native_runner_url = None
         try:
             nessie_native_runner_url = self.__versions_dict["uris"]["nessie_native_image_binary"]
@@ -151,7 +148,7 @@ class NessieDemo:
             )
         return nessie_native_runner_url
 
-    def __prepare_nessie_runner(self: T) -> None:
+    def __prepare_nessie_runner(self: "NessieDemo") -> None:
         if "nessie_runner" in self.__versions_dict:
             runner = self.__versions_dict["nessie_runner"]
             if isinstance(runner, str):
@@ -169,7 +166,7 @@ class NessieDemo:
 
         self.__nessie_native_runner = runner
 
-    def __prepare(self: T) -> None:
+    def __prepare(self: "NessieDemo") -> None:
         # Install Python dependencies
         if "python_dependencies" in self.__versions_dict:
             deps_list = self.__versions_dict["python_dependencies"]
@@ -180,13 +177,13 @@ class NessieDemo:
 
         self.__prepare_nessie_runner()
 
-    def _get_pid_file(self: T) -> str:
+    def _get_pid_file(self: "NessieDemo") -> str:
         return self._asset_dir("nessie.pid")
 
-    def _get_version_file(self: T) -> str:
+    def _get_version_file(self: "NessieDemo") -> str:
         return self._asset_dir("nessie.version")
 
-    def __pid_from_file(self: T) -> int:
+    def __pid_from_file(self: "NessieDemo") -> int:
         pid_file = self._get_pid_file()
         if not os.path.exists(pid_file):
             return -1
@@ -200,18 +197,18 @@ class NessieDemo:
             else:
                 return pid
 
-    def _get_pid(self: T) -> int:
+    def _get_pid(self: "NessieDemo") -> int:
         if hasattr(self, "__nessie_process") and not self.__nessie_process.poll():
             return self.__nessie_process.pid
         return self.__pid_from_file()
 
-    def is_nessie_running(self: T) -> bool:
+    def is_nessie_running(self: "NessieDemo") -> bool:
         """Check whether a Nessie process is running."""
         if hasattr(self, "__nessie_process") and not self.__nessie_process.poll():
             return True
         return self.__pid_from_file() > 0
 
-    def start(self: T) -> None:
+    def start(self: "NessieDemo") -> None:
         """Starts the Nessie process.
 
         A running Nessie process will only be stopped, if it is running a different Nessie version.
@@ -262,7 +259,7 @@ class NessieDemo:
         finally:
             std_capt.close()
 
-    def stop(self: T) -> None:
+    def stop(self: "NessieDemo") -> None:
         """Stops a running Nessie process. This method is a no-op, if Nessie is not running."""
         pid = self._get_pid()
         if pid > 0:
@@ -283,7 +280,7 @@ class NessieDemo:
             if os.path.exists(f):
                 os.unlink(f)
 
-    def fetch_dataset(self: T, dataset_name: str) -> dict:  # dict[str, os.path]
+    def fetch_dataset(self: "NessieDemo", dataset_name: str) -> dict:  # dict[str, os.path]
         """Fetches a data set, a collection of files, for a demo.
 
         Data sets are identified by a name, which corresponds to a subdirectory underneath the `datasets/`
@@ -317,19 +314,19 @@ class NessieDemo:
 
         return name_to_path
 
-    def _get_versions_dict(self: T) -> dict:
+    def _get_versions_dict(self: "NessieDemo") -> dict:
         """Get the versions-dictionary retrieved from one of the config files in the `configs/` directory."""
         return self.__versions_dict
 
-    def get_nessie_api_uri(self: T) -> str:
+    def get_nessie_api_uri(self: "NessieDemo") -> str:
         """Get the Nessie server's API URL."""
         return self.__nessie_api_uri
 
-    def get_versions_yaml(self: T) -> str:
+    def get_versions_yaml(self: "NessieDemo") -> str:
         """Get the name of the versions-dictionary, as passed to the constructor of `NessieDemo` or to `nessiedemos.demo.setupDemo()`."""
         return self.__versions_yaml
 
-    def _pull_product_distribution(self: T, product_id: str, product_name: str) -> Union[None, str]:
+    def _pull_product_distribution(self: "NessieDemo", product_id: str, product_name: str) -> Union[None, str]:
         if product_id not in self._get_versions_dict() or "tarball" not in self._get_versions_dict()[product_id]:
             return None
 
