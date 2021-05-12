@@ -21,6 +21,7 @@ Tests in this module are rather slow, because the nessie-quarkus-runner and Spar
 """
 import os
 
+import pytest
 from pytest import fixture
 
 from nessiedemo.demo import NessieDemo, setup_demo
@@ -33,6 +34,7 @@ def before_all(tmpdir_factory, request) -> None:  # noqa: ANN001
     demo_setup_fixture_for_tests(tmpdir_factory, request)
 
 
+@pytest.mark.forked
 class TestNessieDemo:
     """Tests for `NessieDemo`."""
 
