@@ -25,6 +25,7 @@ have been installed, all Spark related code must be in a separate Python module 
 
 import os
 import re
+import sysconfig
 from types import TracebackType
 from typing import Any, Tuple, TypeVar
 
@@ -54,18 +55,24 @@ class NessieDemoSpark:
         """Creates a `NessieDemoSpark` instance for respectively using the given `NessieDemo` instance."""
         self.__demo = demo
 
-        spark_url = self.__demo._get_versions_dict()["spark"]["tarball"]
-        # derive directory name inside the tarball from the URL
-        m = re.match(".*[/]([a-zA-Z0-9-.]+)[.]tgz", spark_url)
-        if not m:
-            raise Exception("Invalid Spark download URL {}".format(spark_url))
-        dir_name = m.group(1)
-        spark_dir = self.__demo._asset_dir(dir_name)
-        if not os.path.exists(spark_dir):
-            tgz = self.__demo._asset_dir("{}.tgz".format(dir_name))
-            if not os.path.exists(tgz):
-                _Util.wget(spark_url, tgz)
-            _Util.exec_fail(["tar", "-x", "-C", os.path.abspath(os.path.join(spark_dir, "..")), "-f", tgz])
+        pyspark_dir = os.path.join(sysconfig.get_paths()["purelib"], "pyspark")
+        if os.path.isdir(pyspark_dir):
+            spark_dir = pyspark_dir
+        elif "spark" in self.__demo._get_versions_dict() and "tarball" in self.__demo._get_versions_dict()["spark"]:
+            spark_url = self.__demo._get_versions_dict()["spark"]["tarball"]
+            # derive directory name inside the tarball from the URL
+            m = re.match(".*[/]([a-zA-Z0-9-.]+)[.]tgz", spark_url)
+            if not m:
+                raise Exception("Invalid Spark download URL {}".format(spark_url))
+            dir_name = m.group(1)
+            spark_dir = self.__demo._asset_dir(dir_name)
+            if not os.path.exists(spark_dir):
+                tgz = self.__demo._asset_dir("{}.tgz".format(dir_name))
+                if not os.path.exists(tgz):
+                    _Util.wget(spark_url, tgz)
+                _Util.exec_fail(["tar", "-x", "-C", os.path.abspath(os.path.join(spark_dir, "..")), "-f", tgz])
+        else:
+            raise Exception("configuration does not define spark.tarball and pyspark is not installed. Unable to find Spark.")
 
         print("Using Spark in {}".format(spark_dir))
 

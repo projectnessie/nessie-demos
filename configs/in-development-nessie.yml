@@ -50,7 +50,4 @@ python_dependencies:
 python_dependencies_reinstall:
   - !env NESSIE_DEMO_IN_DEV_PYNESSIE_PATH
 
-spark:
-  tarball: https://downloads.apache.org/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz
-
 nessie_runner: !env NESSIE_DEMO_IN_DEV_NESSIE_RUNNER
