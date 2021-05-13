@@ -58,6 +58,8 @@ class NessieDemo:
     __nessie_version: str
     __iceberg_version: str
 
+    pip_install_verbose: bool = False
+
     def __init__(self: T, versions_yaml: str) -> None:
         """Takes the name of the versions-dictionary."""
         if "NESSIE_DEMO_ROOT" in os.environ and len(os.environ["NESSIE_DEMO_ROOT"]) > 0:
@@ -166,10 +168,10 @@ class NessieDemo:
         # Install Python dependencies
         if "python_dependencies" in self.__versions_dict:
             deps_list = self.__versions_dict["python_dependencies"]
-            _Util.exec_fail([sys.executable, "-m", "pip", "install"] + deps_list)
+            _Util.exec_fail([sys.executable, "-m", "pip", "install"] + deps_list, pipe_output=self.pip_install_verbose)
         if "python_dependencies_reinstall" in self.__versions_dict:
             deps_list = self.__versions_dict["python_dependencies_reinstall"]
-            _Util.exec_fail([sys.executable, "-m", "pip", "install", "--force-reinstall"] + deps_list)
+            _Util.exec_fail([sys.executable, "-m", "pip", "install", "--force-reinstall"] + deps_list, pipe_output=self.pip_install_verbose)
 
         self.__prepare_nessie_runner()
 
@@ -342,18 +344,22 @@ class NessieDemo:
 
 class _Util:
     @staticmethod
-    def exec_fail(args: list, cwd: str = None) -> None:  # noqa: C901
-        print("Executing {} ...".format(" ".join(args)))
+    def exec_fail(args: list, cwd: str = None, pipe_output=True) -> None:  # noqa: C901
+        print("Executing {}{} ...".format(" ".join(args), "" if pipe_output else ", process output hidden"))
         proc = Popen(args, stdin=DEVNULL, stdout=PIPE, stderr=STDOUT, text=True, cwd=cwd)  # noqa: S603
         stdout: Any = proc.stdout
         poll_obj = poll()
         poll_obj.register(stdout, POLLIN)
         exit_code = None
+        captured_output = []
         while True:
             poll_result = poll_obj.poll(0.1)
             if poll_result:
                 line = stdout.readline()
-                sys.stdout.write(line)
+                if pipe_output:
+                    sys.stdout.write(line)
+                else:
+                    captured_output.append(line)
                 if exit_code and len(line) == 0:
                     break
             if not exit_code:
@@ -361,6 +367,8 @@ class _Util:
                     exit_code = proc.poll()
                     if exit_code is not None:
                         if exit_code != 0:
+                            if not pipe_output:
+                                sys.stdout.write("".join(captured_output))
                             raise Exception("Executable failed, exit-code={}. args: {}".format(exit_code, args))
                         break
                 except OSError:
