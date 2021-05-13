@@ -75,7 +75,7 @@ def notebook():
 
 def test_notebook_output(notebook):
     """
-    Runs throuhg the entire notebook and checks the output
+    Runs through the entire notebook and checks the output
 
     :param notebook: The notebook to test
     :return:
