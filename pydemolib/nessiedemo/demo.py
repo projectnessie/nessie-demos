@@ -344,7 +344,7 @@ class NessieDemo:
 
 class _Util:
     @staticmethod
-    def exec_fail(args: list, cwd: str = None, pipe_output=True) -> None:  # noqa: C901
+    def exec_fail(args: list, cwd: str = None, pipe_output: bool = True) -> None:  # noqa: C901
         print("Executing {}{} ...".format(" ".join(args), "" if pipe_output else ", process output hidden"))
         proc = Popen(args, stdin=DEVNULL, stdout=PIPE, stderr=STDOUT, text=True, cwd=cwd)  # noqa: S603
         stdout: Any = proc.stdout
