@@ -1,4 +1,4 @@
-# Prototype repo to build demos for Nessie
+# Nessie Demos
 
 [![Main CI](https://github.com/projectnessie/nessie-demos/actions/workflows/main.yml/badge.svg)](https://github.com/projectnessie/nessie-demos/actions/workflows/main.yml)
 
@@ -7,6 +7,12 @@ The work in this repo is still in "draft mode".  Some previews:
 * Nessie-Iceberg-NBA Jupyter Notebook
     * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-iceberg-demo-nba.ipynb)
     * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-iceberg-demo-nba.ipynb)
+
+Upcoming:
+
+* Notebooks for Nessie w/ Flink+Iceberg
+* Notebooks for Nessie w/ Deltalake
+* Katacoda tutorials
 
 ## Scope
 
