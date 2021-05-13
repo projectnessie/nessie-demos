@@ -17,6 +17,7 @@
 # Nessie Demos artifacts
 nessie-runner-output.log
 colab/_assets/
+colab/tests/_assets/
 colab/spark_warehouse/
 colab/.ipynb_checkpoints/
 
