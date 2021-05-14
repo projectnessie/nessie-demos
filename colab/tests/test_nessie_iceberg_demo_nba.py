@@ -64,7 +64,10 @@ num_salaries_on_main = """+--------+
 
 
 @pytest.fixture(scope='module')
-def notebook():
+def notebook(tmpdir_factory):
+    tmpdir = str(tmpdir_factory.mktemp("_assets"))
+    os.environ["NESSIE_DEMO_ASSETS"] = tmpdir
+
     path = os.path.abspath("../..")
     if not os.path.exists(path):
         path = os.path.abspath(".")
