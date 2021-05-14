@@ -15,13 +15,12 @@
 # limitations under the License.
 #
 
-cd $(dirname $0)
-. ../venv/bin/activate
+. $(dirname $0)/../venv/bin/activate
 
 if [[ -n $1 ]]; then
   PATTERN="$1"
 else
-  PATTERN="*.ipynb"
+  PATTERN="$(dirname $0)/*.ipynb"
 fi
 
 for f in $PATTERN; do
