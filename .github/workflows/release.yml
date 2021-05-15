@@ -1,0 +1,111 @@
+#
+# Copyright (C) 2020 Dremio
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Secrets:
+# - NESSIE_BUILDER    GH Personal-Access-Token to push to main branch,
+#                     skipping branch-protection-rules.
+# - PYPI_API_TOKEN    PiPy API token that can push a release
+
+name: release
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionBump:
+        description: 'Type of version bump - one of: path, minor, major'
+        required: true
+        default: patch
+
+jobs:
+  release:
+    name: Relase
+    runs-on: ubuntu-latest
+
+    environment: release
+
+    steps:
+
+    # Check that the commit that is becoming a release has passed CI.
+    # Note: intentionally hard-coded projectnessie/nessiedemo, so this check even works when *testing*
+    # the workflow on a PR-branch.
+    - name: Check commit status
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+        gh api repos/projectnessie/nessiedemo/commits/${GITHUB_SHA}/check-runs --jq 'if ([.check_runs[] | select(.name | endswith(" release") | not ) | .conclusion] | unique == ["success"]) then "OK" else error("Commit checks are not OK") end'
+
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      working-directory: ./pydemolib
+      run: |
+        python -m pip install --upgrade pip
+        pip install bump2version twine build
+
+    - name: Bump version
+      working-directory: ./pydemolib
+      run: bump2version --commit --tag ${{ github.event.inputs.versionBump }}
+
+    - name: Get version
+      id: get_version
+      working-directory: ./pydemolib
+      run: echo ::set-output name=VERSION::$(python3 -c 'import nessiedemo; print(nessiedemo.__version__)')
+
+    - name: Build
+      working-directory: ./pydemolib
+      run: python3 -m build
+
+    - name: Check build
+      working-directory: ./pydemolib
+      run: twine check dist/*
+
+    - name: Push to main branch
+      run: |
+        # Push directly using the remote repo URL, which includes the secret so this job can push to the repo
+        UPSTREAM="https://${{ secrets.NESSIE_BUILDER }}@github.com/${GITHUB_REPOSITORY}.git"
+
+        # Move the default auth settings in ~/.gitconfig out of the way, so the git-push can use the token
+        git config --rename-section http.https://github.com/ http.https://save.github.com/
+
+        git push --no-verify --tags "${UPSTREAM}" HEAD:${GITHUB_REF}
+
+        # Move the default auth settings in ~/.gitconfig back
+        git config --rename-section http.https://save.github.com/ http.https://github.com/
+
+    - name: Publish nessiedemo package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+        packages_dir: ./pydemolib/dist/
+        repository_url: https://test.pypi.org/legacy/
+
+    - name: Create release in GitHub
+      env:
+        RELEASE_VERSION: ${{ steps.get_version.outputs.VERSION }}
+        GIT_TAG: v${{ steps.get_version.outputs.VERSION }}
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
+        gh release create ${GIT_TAG} --title "Nessie-Demos ${RELEASE_VERSION}"
