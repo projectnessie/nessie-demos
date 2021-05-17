@@ -64,6 +64,6 @@ setup(
     test_suite="tests",
     tests_require=[],
     url="https://github.com/projectnessie/nessie",
-    version="0.0.12",
+    version="0.0.13",
     zip_safe=False,
 )
