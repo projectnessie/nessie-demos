@@ -31,6 +31,8 @@ pydemolib/build/
 pydemolib/dist/
 pydemolib/.eggs/
 pydemolib/*.egg-info/
+pydemolib/derby.log
+pydemolib/metastore_db/
 
 # Jetbrains IDEs
 /.idea
