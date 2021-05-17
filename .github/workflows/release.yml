@@ -64,6 +64,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install bump2version twine build
 
+    - name: Configure release-bot-user in git config
+      run: |
+        git config --global user.email "nessie-release-workflow-noreply@projectnessie.org"
+        git config --global user.name "Nessie Release Workflow [bot]"
+
     - name: Bump version
       working-directory: ./pydemolib
       run: bump2version --commit --tag ${{ github.event.inputs.versionBump }}
