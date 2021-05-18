@@ -75,6 +75,9 @@ class TestNessieDemo:
         ds_nba2 = demo2.fetch_dataset("nba")
         assert ds_nba == ds_nba2
 
+        demo2.stop()
+        demo2.start()
+
     def test_setup_method(self: object) -> None:
         """Test the convenience nessiedemo.demo.setup_demo()."""
         demo = setup_demo("nessie-0.5-iceberg-0.11.yml")
