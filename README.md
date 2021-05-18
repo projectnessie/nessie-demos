@@ -12,14 +12,13 @@ Upcoming:
 
 * Notebooks for Nessie w/ Flink+Iceberg
 * Notebooks for Nessie w/ Deltalake
-* Katacoda tutorials
 
 ## Scope
 
 Build a framework for demos that run on Jupyter notebook environments like 
 [Google Colaboratory](https://colab.research.google.com/) and
 [Binder](https://mybinder.org) and locally (for development purposes),
-and on tutorial/course/learning platforms like [Katacoda](https://katacoda.com).
+and on tutorial/course/learning platforms (future).
 
 As long as it is feasible and doesn't delay the work
 for demos, have a base for production-like performance testing, which has the same or at least
@@ -114,12 +113,10 @@ It feels nicer to ensure that everything in the demos repo works against the "la
 versions.
 
 If someone wants to run demos against an older "set of versions":
-* In Google Colaboratory it's as easy as opening a different URL.
-* In Katakoda there seems to be no way to "just use a different URL/branch/tag".
+* In Google Colaboratory and Binder it's as easy as opening a different URL.
 
 We might either accept that certain environments just don't support "changing versions on the fly"
 or we use a different strategy, if that's necessary. So the options are probably:
-* Demos (in Katakoda) only work against the "latest set of versions"
 * "Archive" certain, relevant demos in the demo-repo's "main" branch in separate directories
 
 I suspect, this chapter requires some more "brain cycles".
