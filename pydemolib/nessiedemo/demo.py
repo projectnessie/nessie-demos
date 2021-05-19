@@ -21,10 +21,9 @@ import sys
 from select import poll, POLLIN
 from signal import SIGKILL, SIGTERM
 from subprocess import DEVNULL, PIPE, Popen, STDOUT, TimeoutExpired  # noqa: S404
-from threading import Thread
 from time import sleep, time
 from types import TracebackType
-from typing import Any, BinaryIO, TypeVar
+from typing import Any, TypeVar
 
 import requests
 import yaml
@@ -206,24 +205,6 @@ class NessieDemo:
             return True
         return self.__pid_from_file() > 0
 
-    @staticmethod
-    def __process_watchdog(proc: Popen, std_capt: BinaryIO) -> None:
-        def __watch_process() -> None:
-            while True:
-                try:
-                    _, _ = proc.communicate(timeout=0.1)
-                    if proc.poll():
-                        break
-                except TimeoutExpired:
-                    pass
-                except Exception:
-                    # There's not much we can do here
-                    break
-            std_capt.close()
-
-        comm_thread = Thread(name="Comm Nessie PID {}".format(proc.pid), target=__watch_process, daemon=True)
-        comm_thread.start()
-
     def start(self: T) -> None:
         """Starts the Nessie process.
 
@@ -252,8 +233,6 @@ class NessieDemo:
 
             self.__nessie_process = Popen(self.__nessie_native_runner, stdin=DEVNULL, stdout=std_capt, stderr=std_capt)  # noqa: S603
 
-            self.__process_watchdog(self.__nessie_process, std_capt)
-
             with open(self._get_pid_file(), "wb") as out:
                 out.write(str(self.__nessie_process.pid).encode("utf-8"))
             with open(self._get_version_file(), "wb") as out:
@@ -274,6 +253,8 @@ class NessieDemo:
         except Exception:
             os.unlink(log_file)
             raise
+        finally:
+            std_capt.close()
 
     def stop(self: T) -> None:
         """Stops a running Nessie process. This method is a no-op, if Nessie is not running."""
@@ -287,10 +268,11 @@ class NessieDemo:
                     if time() > timeout_at:
                         print("Running Nessie process with PID {} didn't react to SIGTERM, sending SIGKILL".format(pid))
                         os.kill(pid, SIGKILL)
+                        break
                     sleep(0.1)
                 except OSError:
+                    print("Nessie stopped")
                     break
-            print("Nessie stopped")
         for f in [self._get_pid_file(), self._get_version_file()]:
             if os.path.exists(f):
                 os.unlink(f)
