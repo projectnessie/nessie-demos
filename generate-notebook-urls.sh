@@ -17,7 +17,7 @@
 
 # Script that generates the URLs for a notebook in this repo.
 # Run this script and pass the path to the Jupyter notebook as the argument. Example:
-#    ./generate-notebook-urls.sh colab/try-it.ipynb
+#    ./generate-notebook-urls.sh colab/nessie-iceberg-demo-nba.ipynb
 
 set -e
 
