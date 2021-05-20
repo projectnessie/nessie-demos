@@ -73,6 +73,8 @@ class NessieDemo:
             if "NESSIE_DEMO_ASSETS" in os.environ and len(os.environ["NESSIE_DEMO_ASSETS"]) > 0
             else os.path.join(os.getcwd(), "_assets")
         )
+        if not os.path.isdir(self.__assets_dir):
+            os.makedirs(self.__assets_dir)
 
         self.__datasets = dict()
 
@@ -250,9 +252,9 @@ class NessieDemo:
             except TimeoutExpired:
                 print("Nessie running with PID {}".format(self.__nessie_process.pid))
                 pass
-        except Exception:
+        except BaseException as e:
             os.unlink(log_file)
-            raise
+            raise e
         finally:
             std_capt.close()
 
@@ -380,10 +382,10 @@ class _Util:
                     os.stat(target).st_mode | stat.S_IXUSR,
                 )
             print("Completed download of {}".format(url))
-        except Exception:
+        except BaseException as e:
             if os.path.exists(target):
                 os.unlink(target)
-            raise
+            raise e
 
     @staticmethod
     def curl(url: str) -> bytes:
