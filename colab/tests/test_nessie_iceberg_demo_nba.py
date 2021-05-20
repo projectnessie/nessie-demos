@@ -72,7 +72,8 @@ def notebook(tmpdir_factory):
     if not os.path.exists(path):
         path = os.path.abspath(".")
     path_to_notebook = os.path.join(path, "colab/nessie-iceberg-demo-nba.ipynb")
-    with testbook(path_to_notebook, execute=True, timeout=300) as tb:
+    with testbook(path_to_notebook, timeout=300) as tb:
+        tb.execute()
         yield tb
 
 
