@@ -19,6 +19,7 @@ import os
 import site
 import stat
 import sys
+from pathlib import Path
 from select import poll, POLLIN
 from signal import SIGKILL, SIGTERM
 from subprocess import DEVNULL, PIPE, Popen, STDOUT, TimeoutExpired  # noqa: S404
@@ -136,7 +137,7 @@ class NessieDemo:
         """Get the Iceberg download URL for a jar file of the given iceberg component."""
         version = self.get_iceberg_version()
 
-        home = os.environ["HOME"]
+        home = str(Path.home())
         local_url = f"{home}/.m2/repository/org/apache/iceberg/{iceberg_component}/{version}/{iceberg_component}-{version}.jar"
         if os.path.exists(local_url):
             return "file://" + local_url
