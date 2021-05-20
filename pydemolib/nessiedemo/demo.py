@@ -16,14 +16,18 @@
 #
 """NessieDemo handles installing and, if necessary, downloading of dependencies for Nessie Demos."""
 import os
+import re
+import shutil
+import site
 import stat
 import sys
+import sysconfig
 from select import poll, POLLIN
 from signal import SIGKILL, SIGTERM
 from subprocess import DEVNULL, PIPE, Popen, STDOUT, TimeoutExpired  # noqa: S404
 from time import sleep, time
 from types import TracebackType
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Union
 
 import requests
 import yaml
@@ -325,6 +329,29 @@ class NessieDemo:
         """Get the name of the versions-dictionary, as passed to the constructor of `NessieDemo` or to `nessiedemos.demo.setupDemo()`."""
         return self.__versions_yaml
 
+    def _pull_product_distribution(self: T, product_id: str, product_name: str) -> Union[None, str]:
+        if product_id not in self._get_versions_dict() or "tarball" not in self._get_versions_dict()[product_id]:
+            return None
+
+        download_url = self._get_versions_dict()[product_id]["tarball"]
+        # derive directory name inside the tarball from the URL
+        m = re.match(".*[/]([a-zA-Z0-9-.]+)[.](tgz|tar[.]gz)", download_url)
+        if not m:
+            raise Exception(f"Invalid {product_name} download URL {download_url}")
+        dir_name = m.group(1)
+        target_dir = self._asset_dir(dir_name)
+        if not os.path.exists(target_dir):
+            tgz = self._asset_dir("{}.tgz".format(dir_name))
+            if not os.path.exists(tgz):
+                _Util.wget(download_url, tgz)
+            try:
+                os.makedirs(target_dir)
+                _Util.exec_fail(["tar", "-x", "-C", target_dir, "--strip-components=1", "-f", tgz])
+            except BaseException as e:
+                shutil.rmtree(target_dir, True)
+                raise e
+        return target_dir
+
 
 class _Util:
     @staticmethod
@@ -398,6 +425,14 @@ class _Util:
                 return resp.content
             else:
                 raise Exception("Could not fetch {}, HTTP/{} {}".format(url, resp.status_code, resp.reason))
+
+    @staticmethod
+    def get_python_package_directory(python_package: str, *sub_directories: str) -> Union[None, str]:
+        for dir in [sysconfig.get_paths()["purelib"]] + site.getsitepackages():
+            package_dir = os.path.join(dir, python_package, *sub_directories)
+            if os.path.exists(package_dir):
+                return package_dir
+        return None
 
 
 __NESSIE_DEMO__ = None

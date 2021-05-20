@@ -22,9 +22,9 @@ Tests in this module are rather slow, because the nessie-quarkus-runner and Spar
 import os
 
 import pytest
-from pytest import fixture
+from pytest import fail, fixture
 
-from nessiedemo.demo import NessieDemo, setup_demo
+from nessiedemo.demo import _Util, NessieDemo, setup_demo
 from .util import demo_setup_fixture_for_tests
 
 
@@ -86,3 +86,29 @@ class TestNessieDemo:
 
         assert demo2 is demo
         assert demo3 is demo
+
+    def test_product_download(self: object) -> None:
+        """Test the functionality to download and install product tarballs."""
+        demo = NessieDemo("nessie-0.5-iceberg-0.11.yml")
+
+        assert not demo._pull_product_distribution("foo", "Foo")
+
+        versions_dict = demo._get_versions_dict()
+        # invalid download url
+        versions_dict["foo"] = {"tarball": "http-foo-bar-baz"}
+        try:
+            demo._pull_product_distribution("foo", "Foo")
+            fail()
+        except Exception as e:
+            assert str(e) == "Invalid Foo download URL http-foo-bar-baz"
+
+        versions_dict["foo"] = {"tarball": "https://github.com/projectnessie/nessie/archive/refs/tags/nessie-0.2.0.tar.gz"}
+        foo_dir = demo._pull_product_distribution("foo", "foo")
+        assert os.path.basename(foo_dir) == "nessie-0.2.0"
+        assert os.path.isdir(foo_dir)
+
+    def test_get_python_package_directory(self: object) -> None:
+        """Test functionality to find a Python package directory or subdirectory."""
+        assert not _Util.get_python_package_directory("no_no_no_not_there")
+        assert os.path.isdir(_Util.get_python_package_directory("pytest"))
+        assert os.path.isdir(_Util.get_python_package_directory("pip", "_internal", "cli"))
