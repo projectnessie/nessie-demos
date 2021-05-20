@@ -16,6 +16,7 @@
 #
 """NessieDemo handles installing and, if necessary, downloading of dependencies for Nessie Demos."""
 import os
+import site
 import stat
 import sys
 from select import poll, POLLIN
@@ -131,7 +132,7 @@ class NessieDemo:
         """Get the Iceberg version defined in the versions-dictionary."""
         return self.__iceberg_version
 
-    def get_iceberg_download_url_for_jar(self: T, iceberg_component: str) -> str:
+    def _get_iceberg_download_url_for_jar(self: T, iceberg_component: str) -> str:
         """Get the Iceberg download URL for a jar file of the given iceberg component."""
         version = self.get_iceberg_version()
 
@@ -406,6 +407,13 @@ class _Util:
                 return resp.content
             else:
                 raise Exception("Could not fetch {}, HTTP/{} {}".format(url, resp.status_code, resp.reason))
+
+    @staticmethod
+    def get_python_package_directory(python_package: str, *sub_directories: str) -> str:
+        package_dir = os.path.join(site.getsitepackages()[0], python_package, *sub_directories)
+        if not os.path.exists(package_dir):
+            raise Exception(f"could not find {python_package} with subdirectories {sub_directories} at location {package_dir}")
+        return package_dir
 
 
 __NESSIE_DEMO__ = None

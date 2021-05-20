@@ -19,7 +19,6 @@
 import os
 import re
 import shutil
-import site
 from types import TracebackType
 from typing import Any, Tuple, TypeVar
 
@@ -75,9 +74,7 @@ class NessieDemoFlink:
                 if file.endswith(".jar"):
                     jar_files.append(os.path.join(root, file))
 
-        pyflink_lib_dir = os.path.join(site.getsitepackages()[0], "pyflink", "lib")
-        if not os.path.exists(pyflink_lib_dir):
-            raise Exception("could not find pyflink lib directory at location " + pyflink_lib_dir)
+        pyflink_lib_dir = _Util.get_python_package_directory("pyflink", "lib")
 
         print(f"Copying all HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}")
         for jar in jar_files:
@@ -104,7 +101,8 @@ class NessieDemoFlink:
 
         iceberg_flink_runtime_jar = "iceberg-flink-runtime-{}.jar".format(self.__demo.get_iceberg_version())
         asset_dir = self.__demo._asset_dir(iceberg_flink_runtime_jar)
-        _Util.wget(self.__demo.get_iceberg_download_url_for_jar("iceberg-flink-runtime"), asset_dir)
+        if not os.path.exists(iceberg_flink_runtime_jar):
+            _Util.wget(self.__demo._get_iceberg_download_url_for_jar("iceberg-flink-runtime"), asset_dir)
         env.add_jars("file://{}".format(asset_dir))
 
         self.__env = env
@@ -150,8 +148,7 @@ def flink_for_demo(demo: NessieDemo, nessie_ref: str = "main", catalog_name: str
     """Sets up the `StreamTableEnvironment` ready to use for the provided/default `nessie_ref`.
 
     :param demo: `NessieDemo` instance to use.
-    :param nessie_ref: the Nessie reference as a `str` to configure in the
-    `StreamTableEnvironment`.
+    :param nessie_ref: the Nessie reference as a `str` to configure in the `StreamTableEnvironment`.
     Can be a branch name, tag name or commit hash.
     :param catalog_name: Name of the catalog, defaults to `nessie`.
     :return: A 2-tuple of `StreamTableEnvironment` and `NessieDemoFlink`
