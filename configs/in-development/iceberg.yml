@@ -32,7 +32,7 @@
 ### THIS IS A CONFIG INTENDED FOR NESSIE DEVELOPERS! ###
 
 versions:
-  nessie: 0.5.1
+  nessie: 0.6.0
   iceberg: !env NESSIE_DEMO_IN_DEV_ICEBERG_VERSION
 
 python_dependencies:
@@ -40,4 +40,4 @@ python_dependencies:
   - pyspark==3.1.1
   - pandas==1.2.4
   - pyarrow==4.0.0
-  - pynessie==0.5.1
+  - pynessie==0.6.0

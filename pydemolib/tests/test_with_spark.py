@@ -111,13 +111,13 @@ class TestWithSpark:
     @pytest.mark.forked
     def test_with_spark_iceberg_in_dev(self: object) -> None:
         """Test NessieDemo+Spark against an in-development version of Iceberg built locally from source."""
-        TestWithSpark.__test_with_spark("in-development-iceberg.yml", ["NESSIE_DEMO_IN_DEV_ICEBERG_VERSION"])
+        TestWithSpark.__test_with_spark("in-development/iceberg.yml", ["NESSIE_DEMO_IN_DEV_ICEBERG_VERSION"])
 
     @pytest.mark.forked
     def test_with_spark_nessie_in_dev(self: object) -> None:
         """Test NessieDemo+Spark against an in-development version of Nessie built locally from source."""
         TestWithSpark.__test_with_spark(
-            "in-development-nessie.yml",
+            "in-development/nessie.yml",
             [
                 "NESSIE_DEMO_IN_DEV_NESSIE_RUNNER",
                 "NESSIE_DEMO_IN_DEV_NESSIE_VERSION",
@@ -129,7 +129,7 @@ class TestWithSpark:
     def test_with_spark_nessie_iceberg_in_dev(self: object) -> None:
         """Test NessieDemo+Spark against an in-development version of Nessie built locally from source."""
         TestWithSpark.__test_with_spark(
-            "in-development-nessie-iceberg.yml",
+            "in-development/nessie-iceberg.yml",
             [
                 "NESSIE_DEMO_IN_DEV_NESSIE_RUNNER",
                 "NESSIE_DEMO_IN_DEV_NESSIE_VERSION",
