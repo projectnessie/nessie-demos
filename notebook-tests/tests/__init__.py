@@ -24,6 +24,8 @@ def _find_notebook(notebook_file: str) -> str:
     if not os.path.exists(path_to_notebook):
         path_to_notebook = os.path.join("..", path_to_notebook)
     if not os.path.exists(path_to_notebook):
+        path_to_notebook = os.path.join("..", path_to_notebook)
+    if not os.path.exists(path_to_notebook):
         raise Exception(
             f"Could not find {notebook_file} in {os.path.abspath('.')} and {os.path.abspath('..')}"
         )

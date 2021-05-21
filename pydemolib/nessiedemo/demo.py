@@ -22,6 +22,7 @@ import site
 import stat
 import sys
 import sysconfig
+from pathlib import Path
 from select import poll, POLLIN
 from signal import SIGKILL, SIGTERM
 from subprocess import DEVNULL, PIPE, Popen, STDOUT, TimeoutExpired  # noqa: S404
@@ -133,6 +134,16 @@ class NessieDemo:
     def get_iceberg_version(self: "NessieDemo") -> str:
         """Get the Iceberg version defined in the versions-dictionary."""
         return self.__iceberg_version
+
+    def _get_iceberg_download_url_for_jar(self: "NessieDemo", iceberg_component: str) -> str:
+        """Get the Iceberg download URL for a jar file of the given iceberg component."""
+        version = self.get_iceberg_version()
+
+        home = str(Path.home())
+        local_url = f"{home}/.m2/repository/org/apache/iceberg/{iceberg_component}/{version}/{iceberg_component}-{version}.jar"
+        if os.path.exists(local_url):
+            return "file://" + local_url
+        return f"https://repo.maven.apache.org/maven2/org/apache/iceberg/{iceberg_component}/{version}/{iceberg_component}-{version}.jar"
 
     def __nessie_native_runner_url(self: "NessieDemo") -> str:
         nessie_native_runner_url = None
