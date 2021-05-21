@@ -15,14 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from assertpy import assert_that
+"""Tests the Nessie + Iceberg + Spark Jupyter Notebook with the NBA dataset."""
+import os
+from typing import Generator
 
 import pytest
-import os
-
+from _pytest.tmpdir import TempPathFactory
+from assertpy import assert_that
 from testbook import testbook
-
-""" Tests the Nessie + Iceberg + Spark Jupyter Notebook with the NBA dataset"""
+from testbook.client import TestbookNotebookClient
+from tests import _find_notebook
 
 salaries = """+-------+-------------------+---------+--------------+
 | Season|               Team|   Salary|        Player|
@@ -63,29 +65,28 @@ num_salaries_on_main = """+--------+
 +--------+"""
 
 
-@pytest.fixture(scope='module')
-def notebook(tmpdir_factory):
+@pytest.fixture(scope="module")
+def notebook(tmpdir_factory: TempPathFactory) -> Generator:
+    """Prepares nessiedemo env and yields `testbook`."""
     tmpdir = str(tmpdir_factory.mktemp("_assets"))
     os.environ["NESSIE_DEMO_ASSETS"] = tmpdir
 
-    path = os.path.abspath("../..")
-    if not os.path.exists(path):
-        path = os.path.abspath(".")
-    path_to_notebook = os.path.join(path, "colab/nessie-iceberg-demo-nba.ipynb")
+    path_to_notebook = _find_notebook("nessie-iceberg-demo-nba.ipynb")
+
     with testbook(path_to_notebook, timeout=300) as tb:
         tb.execute()
         yield tb
 
 
-def test_notebook_output(notebook):
-    """
-    Runs through the entire notebook and checks the output
+def test_notebook_output(notebook: TestbookNotebookClient) -> None:
+    """Runs through the entire notebook and checks the output.
 
     :param notebook: The notebook to test
     :return:
     """
     assert_that(notebook.cell_output_text(2)).contains(
-            "Dataset nba with files allstar_games_stats.csv, salaries.csv, totals_stats.csv")
+        "Dataset nba with files allstar_games_stats.csv, salaries.csv, totals_stats.csv"
+    )
 
     assert_that(notebook.cell_output_text(2)).contains("Starting Nessie")
 
@@ -100,42 +101,46 @@ def test_notebook_output(notebook):
 
     # !nessie contents --list --ref dev
     assert_that(notebook.cell_output_text(11)).is_equal_to(
-            "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.totals_stats")
+        "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.totals_stats"
+    )
 
     # !nessie --verbose branch
     assert_that(notebook.cell_output_text(13)).contains("main").contains("dev")
 
     # !nessie contents --list
     assert_that(notebook.cell_output_text(22)).is_equal_to(
-            "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.totals_stats")
+        "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.totals_stats"
+    )
 
     # !nessie contents --list --ref etl
     assert_that(notebook.cell_output_text(23)).is_equal_to(
-            "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.allstar_games_stats\r\n\tnba.totals_stats")
+        "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.allstar_games_stats\r\n\tnba.totals_stats"
+    )
 
     # !nessie --verbose branch
     assert_that(notebook.cell_output_text(25)).contains("main").contains(
-            "dev").contains("etl")
+        "dev"
+    ).contains("etl")
 
     # !nessie contents --list --ref experiment
     assert_that(notebook.cell_output_text(30)).is_equal_to(
-            "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.allstar_games_stats")
+        "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.allstar_games_stats"
+    )
 
     # !nessie contents --list
     assert_that(notebook.cell_output_text(31)).is_equal_to(
-            "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.allstar_games_stats\r\n\tnba.totals_stats")
+        "ICEBERG_TABLE:\r\n\tnba.salaries\r\n\tnba.allstar_games_stats\r\n\tnba.totals_stats"
+    )
 
     # spark.sql("select count(*) from nessie.nba.`salaries@experiment`").show()
-    assert_that(notebook.cell_output_text(33)).is_equal_to(
-            num_salaries_on_experiment)
+    assert_that(notebook.cell_output_text(33)).is_equal_to(num_salaries_on_experiment)
 
     # 'spark.sql("select count(*) from nessie.nba.salaries").show()'
     assert_that(notebook.cell_output_text(35)).is_equal_to(num_salaries_on_main)
 
 
-def test_dependency_setup(notebook):
-    """
-    Verifies that dependencies were correctly set up
+def test_dependency_setup(notebook: TestbookNotebookClient) -> None:
+    """Verifies that dependencies were correctly set up.
 
     :param notebook: The notebook to test
     :return:
@@ -146,9 +151,8 @@ def test_dependency_setup(notebook):
     assert_that(demo_spark).is_not_none()
 
 
-def test_dataset_exists(notebook):
-    """
-    Verifies that the NBA dataset exists
+def test_dataset_exists(notebook: TestbookNotebookClient) -> None:
+    """Verifies that the NBA dataset exists.
 
     :param notebook: The notebook to test
     :return:
@@ -160,10 +164,10 @@ def test_dataset_exists(notebook):
 
 
 @pytest.mark.skip(reason="config seems to be pointing to main for all sessions")
-def test_spark_sessions_point_to_correct_nessie_branch(notebook):
-    """
-    Verifies that the different spark sessions point to the correct
-    nessie branches
+def test_spark_sessions_point_to_correct_nessie_branch(
+    notebook: TestbookNotebookClient,
+) -> None:
+    """Verifies that the different spark sessions point to the correct nessie branches.
 
     :param notebook: The notebook to test
     :return:
@@ -172,9 +176,12 @@ def test_spark_sessions_point_to_correct_nessie_branch(notebook):
     spark_etl = notebook.ref("spark_etl")
     spark_experiment = notebook.ref("spark_experiment")
 
-    assert_that(spark_dev.sparkContext.getConf().get(
-            "spark.sql.catalog.nessie.ref")).is_equal_to("dev")
-    assert_that(spark_etl.sparkContext.getConf().get(
-            "spark.sql.catalog.nessie.ref")).is_equal_to("etl")
-    assert_that(spark_experiment.sparkContext.getConf().get(
-            "spark.sql.catalog.nessie.ref")).is_equal_to("experiment")
+    assert_that(
+        spark_dev.sparkContext.getConf().get("spark.sql.catalog.nessie.ref")
+    ).is_equal_to("dev")
+    assert_that(
+        spark_etl.sparkContext.getConf().get("spark.sql.catalog.nessie.ref")
+    ).is_equal_to("etl")
+    assert_that(
+        spark_experiment.sparkContext.getConf().get("spark.sql.catalog.nessie.ref")
+    ).is_equal_to("experiment")

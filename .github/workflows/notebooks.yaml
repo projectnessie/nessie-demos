@@ -47,4 +47,5 @@ jobs:
         working-directory: pydemolib
         run: python -m build
       - name: Test with tox
-        run: tox -c ./colab/tests
+        working-directory: notebook-tests
+        run: tox
