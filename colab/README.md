@@ -9,7 +9,7 @@ notebook itself.
 To run a demo locally with a "standalone Jupyter", you need a fresh "venv":
 
 ```bash
-virtualenv -p $(which python3) venv
+[ ! -d venv ] && virtualenv -p $(which python3) venv
 . venv/bin/activate
 pip install --upgrade pip
 pip install -r pydemolib/requirements.txt

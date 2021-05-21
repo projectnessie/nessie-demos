@@ -42,8 +42,8 @@ The [good first issue](https://github.com/projectnessie/nessie/issues?q=is%3Aiss
 
 ### Style guide
 
-Changes must adhere to the style guide and this will be verified by the continuous integration build. Java code style is approximately 
-Google style and can be checked with Checkstyle. Python adheres to the pep8 standard.
+Changes must adhere to the style guide and this will be verified by the continuous integration build.
+Python code adheres to the pep8 standard.
 
 ### Submitting a pull request
 
