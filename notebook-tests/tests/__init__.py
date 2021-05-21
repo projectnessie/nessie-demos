@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020 Dremio
 #
@@ -13,26 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+"""Unit tests for demo notebooks."""
+import os
 
-[tox]
-envlist = py37, py38, py39
-skipsdist = True
 
-[gh-actions]
-python =
-    3.7: py37
-    3.8: py38
-    3.9: py39
-
-[testenv]
-setenv =
-    PYTHONPATH = {toxinidir}
-    NESSIE_DEMO_ROOT = file://{toxinidir}/../../
-passenv = TOXENV CI TRAVIS TRAVIS_* CODECOV_* NESSIE_*
-deps =
-    -r{toxinidir}/requirements_dev.txt
-    -r{toxinidir}/requirements.txt
-    {toxinidir}/../../pydemolib/dist/nessiedemo-*-py2.py3-none-any.whl
-commands =
-    pip install -U pip
-    pytest --basetemp={envtmpdir} -ra
+def _find_notebook(notebook_file: str) -> str:
+    path_to_notebook = os.path.join("colab", notebook_file)
+    if not os.path.exists(path_to_notebook):
+        path_to_notebook = os.path.join("..", path_to_notebook)
+    if not os.path.exists(path_to_notebook):
+        raise Exception(
+            f"Could not find {notebook_file} in {os.path.abspath('.')} and {os.path.abspath('..')}"
+        )
+    return os.path.abspath(path_to_notebook)

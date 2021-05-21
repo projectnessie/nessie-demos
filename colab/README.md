@@ -19,3 +19,7 @@ pip install jupyterlab
 ## Running in Pycharm
 
 You can use the same venv as mentioned above, actually. Pycharm should "just work".
+
+# Unit tests
+
+Tests for all notebooks are in [notebook-tests](../notebook-tests) to keep this directory mostly clean.
