@@ -167,5 +167,5 @@ class TestWithIcebergFlink:
     @pytest.mark.skip("Skipped until we get a new Iceberg release")
     @pytest.mark.forked
     def test_with_iceberg_flink(self: object) -> None:
-        """Test NessieDemo+Iceberg+Flink against Nessie 0.6.x + Iceberg 0.11.x."""
-        TestWithIcebergFlink.__test_with_iceberg_flink("nessie-0.6-iceberg-flink-0.11.yml", [])
+        """Test NessieDemo+Iceberg+Flink against Nessie 0.6.x + Iceberg 0.12.x."""
+        TestWithIcebergFlink.__test_with_iceberg_flink("in-development/nessie-0.6-iceberg-flink-0.12.yml", [])
