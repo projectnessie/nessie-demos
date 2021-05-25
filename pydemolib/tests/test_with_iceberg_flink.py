@@ -60,6 +60,7 @@ class TestWithIcebergFlink:
         print("Iceberg version: {}".format(demo.get_iceberg_version()))
 
         from nessiedemo.flink import flink_for_demo
+
         catalog_name = "test_with_flink"
         table_env, demo_flink = flink_for_demo(demo, catalog_name=catalog_name)
         assert_that(table_env).is_not_none()
@@ -71,65 +72,97 @@ class TestWithIcebergFlink:
 
         dataset = demo.fetch_dataset("nba")
 
-
         from pyflink.table import DataTypes
         from pyflink.table.descriptors import Schema, OldCsv, FileSystem
 
         # Creating `salaries` table
-        dev_table_env.connect(FileSystem().path(dataset['salaries.csv'])) \
-            .with_format(OldCsv()
-                         .field('Season', DataTypes.STRING()).field("Team", DataTypes.STRING())
-                         .field("Salary", DataTypes.STRING()).field("Player", DataTypes.STRING())) \
-            .with_schema(Schema()
-                         .field('Season', DataTypes.STRING()).field("Team", DataTypes.STRING())
-                         .field("Salary", DataTypes.STRING()).field("Player", DataTypes.STRING())) \
-            .create_temporary_table(f'{catalog_name}.nba.salaries_temp')
+        dev_table_env.connect(FileSystem().path(dataset["salaries.csv"])).with_format(
+            OldCsv()
+            .field("Season", DataTypes.STRING())
+            .field("Team", DataTypes.STRING())
+            .field("Salary", DataTypes.STRING())
+            .field("Player", DataTypes.STRING())
+        ).with_schema(
+            Schema()
+            .field("Season", DataTypes.STRING())
+            .field("Team", DataTypes.STRING())
+            .field("Salary", DataTypes.STRING())
+            .field("Player", DataTypes.STRING())
+        ).create_temporary_table(
+            f"{catalog_name}.nba.salaries_temp"
+        )
 
         dev_table_env.execute_sql(
-            f"CREATE TABLE IF NOT EXISTS {catalog_name}.nba.salaries (Season STRING, Team STRING, Salary STRING, Player STRING)").wait()
+            f"CREATE TABLE IF NOT EXISTS {catalog_name}.nba.salaries (Season STRING, Team STRING, Salary STRING, Player STRING)"
+        ).wait()
 
-        tab = dev_table_env.from_path(f'{catalog_name}.nba.salaries_temp')
-        tab.select(tab.Season, tab.Team, tab.Salary, tab.Player).execute_insert(f'{catalog_name}.nba.salaries').wait()
+        tab = dev_table_env.from_path(f"{catalog_name}.nba.salaries_temp")
+        tab.select(tab.Season, tab.Team, tab.Salary, tab.Player).execute_insert(f"{catalog_name}.nba.salaries").wait()
 
         # Creating `totals_stats` table
-        dev_table_env.connect(FileSystem().path(dataset['totals_stats.csv'])) \
-            .with_format(OldCsv()
-                         .field('Season', DataTypes.STRING()).field("Age", DataTypes.STRING()).field("Team", DataTypes.STRING())
-                         .field("ORB", DataTypes.STRING()).field("DRB", DataTypes.STRING()).field("TRB", DataTypes.STRING())
-                         .field("AST", DataTypes.STRING()).field("STL", DataTypes.STRING()).field("BLK", DataTypes.STRING())
-                         .field("TOV", DataTypes.STRING()).field("PTS", DataTypes.STRING()).field("Player", DataTypes.STRING())
-                         .field("RSorPO", DataTypes.STRING())) \
-            .with_schema(Schema()
-                         .field('Season', DataTypes.STRING()).field("Age", DataTypes.STRING()).field("Team", DataTypes.STRING())
-                         .field("ORB", DataTypes.STRING()).field("DRB", DataTypes.STRING()).field("TRB", DataTypes.STRING())
-                         .field("AST", DataTypes.STRING()).field("STL", DataTypes.STRING()).field("BLK", DataTypes.STRING())
-                         .field("TOV", DataTypes.STRING()).field("PTS", DataTypes.STRING()).field("Player", DataTypes.STRING())
-                         .field("RSorPO", DataTypes.STRING())) \
-            .create_temporary_table(f'{catalog_name}.nba.totals_stats_temp')
+        dev_table_env.connect(FileSystem().path(dataset["totals_stats.csv"])).with_format(
+            OldCsv()
+            .field("Season", DataTypes.STRING())
+            .field("Age", DataTypes.STRING())
+            .field("Team", DataTypes.STRING())
+            .field("ORB", DataTypes.STRING())
+            .field("DRB", DataTypes.STRING())
+            .field("TRB", DataTypes.STRING())
+            .field("AST", DataTypes.STRING())
+            .field("STL", DataTypes.STRING())
+            .field("BLK", DataTypes.STRING())
+            .field("TOV", DataTypes.STRING())
+            .field("PTS", DataTypes.STRING())
+            .field("Player", DataTypes.STRING())
+            .field("RSorPO", DataTypes.STRING())
+        ).with_schema(
+            Schema()
+            .field("Season", DataTypes.STRING())
+            .field("Age", DataTypes.STRING())
+            .field("Team", DataTypes.STRING())
+            .field("ORB", DataTypes.STRING())
+            .field("DRB", DataTypes.STRING())
+            .field("TRB", DataTypes.STRING())
+            .field("AST", DataTypes.STRING())
+            .field("STL", DataTypes.STRING())
+            .field("BLK", DataTypes.STRING())
+            .field("TOV", DataTypes.STRING())
+            .field("PTS", DataTypes.STRING())
+            .field("Player", DataTypes.STRING())
+            .field("RSorPO", DataTypes.STRING())
+        ).create_temporary_table(
+            f"{catalog_name}.nba.totals_stats_temp"
+        )
 
         dev_table_env.execute_sql(
             f"CREATE TABLE IF NOT EXISTS {catalog_name}.nba.totals_stats (Season STRING, Age STRING, Team STRING, \
             ORB STRING, DRB STRING, TRB STRING, AST STRING, STL STRING, BLK STRING, TOV STRING, PTS STRING, \
-            Player STRING, RSorPO STRING)").wait()
+            Player STRING, RSorPO STRING)"
+        ).wait()
 
-        tab = dev_table_env.from_path(f'{catalog_name}.nba.totals_stats_temp')
-        tab.select(tab.Season, tab.Age, tab.Team, tab.ORB, tab.DRB, tab.TRB,
-                   tab.AST, tab.STL, tab.BLK, tab.TOV, tab.PTS, tab.Player, tab.RSorPO).execute_insert(f'{catalog_name}.nba.totals_stats').wait()
+        tab = dev_table_env.from_path(f"{catalog_name}.nba.totals_stats_temp")
+        tab.select(
+            tab.Season, tab.Age, tab.Team, tab.ORB, tab.DRB, tab.TRB, tab.AST, tab.STL, tab.BLK, tab.TOV, tab.PTS, tab.Player, tab.RSorPO
+        ).execute_insert(f"{catalog_name}.nba.totals_stats").wait()
 
         from pyflink.table.expressions import lit
-        num_salaries = table_env.from_path(f'{catalog_name}.nba.`salaries@dev`').select(lit(1).count).to_pandas().to_string()
+
+        num_salaries = table_env.from_path(f"{catalog_name}.nba.`salaries@dev`").select(lit(1).count).to_pandas().to_string()
 
         assert_that(num_salaries).contains("51")
-        assert_that(
-          num_salaries).is_equal_to(dev_table_env.from_path(f'{catalog_name}.nba.salaries').select(lit(1).count).to_pandas().to_string())
+        assert_that(num_salaries).is_equal_to(
+            dev_table_env.from_path(f"{catalog_name}.nba.salaries").select(lit(1).count).to_pandas().to_string()
+        )
 
         # verify that the table does not exist on the main branch
-        expect_error("py4j.protocol.Py4JJavaError", lambda: table_env.from_path(f'{catalog_name}.nba.salaries'))
-        expect_error("py4j.protocol.Py4JJavaError", lambda: table_env.from_path(f'{catalog_name}.nba.`salaries@main`'))
+        expect_error("py4j.protocol.Py4JJavaError", lambda: table_env.from_path(f"{catalog_name}.nba.salaries"))
+        expect_error("py4j.protocol.Py4JJavaError", lambda: table_env.from_path(f"{catalog_name}.nba.`salaries@main`"))
 
         run(["nessie", "merge", "dev", "-b", "main", "--force"])  # noqa: S603 S607
 
-        assert_that(table_env.from_path(f'{catalog_name}.nba.`salaries@main`').select(lit(1).count).to_pandas().to_string()).is_equal_to(num_salaries)
+        assert_that(table_env.from_path(f"{catalog_name}.nba.`salaries@main`").select(lit(1).count).to_pandas().to_string()).is_equal_to(
+            num_salaries
+        )
 
     @pytest.mark.skip("Skipped until we get a new Iceberg release")
     @pytest.mark.forked
