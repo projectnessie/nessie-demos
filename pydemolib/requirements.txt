@@ -13,5 +13,5 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-PyYAML>=3.13
+PyYAML>=5.4.0
 requests>=2.23.0
