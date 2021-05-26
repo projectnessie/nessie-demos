@@ -16,4 +16,4 @@
 
 # requirements.txt for mybinder.org
 
-PyYAML>=3.13
+PyYAML>=5.4.0
