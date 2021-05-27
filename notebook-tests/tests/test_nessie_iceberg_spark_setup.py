@@ -59,55 +59,15 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     # !nessie branch
     assert_that(notebook.cell_output_text(3)).contains("main")
 
-    # !pip show pyspark
-    assert_that(notebook.cell_output_text(6)).contains("Location: ").contains(
-        "Summary: Apache Spark Python API"
-    )
-
-    # Find Spark dist via pyspark
-    spark_dir = notebook.ref("spark_dir")
-    assert_that(spark_dir).is_not_none()
-    assert_that(notebook.cell_output_text(9)).contains("Found Spark distribution in ")
-
-    # Spark dist download URL
-    spark_download_url = notebook.ref("spark_download_url")
-    assert_that(spark_download_url).is_not_none()
-    assert_that(notebook.cell_output_text(11)).contains(
-        f"Spark distribution download URL is {spark_download_url}"
-    )
-
-    # Download Spark dist (cell 12)
-    spark_file_name = notebook.ref("spark_file_name")
-    assert_that(os.path.isfile(spark_file_name))
-    spark_dir_name = notebook.ref("spark_dir_name")
-
-    # !ls -al .
-    assert_that(notebook.cell_output_text(13)).contains(spark_file_name)
-
-    # tar xf (cell 14)
-
-    # !ls -al . (cell 15)
-    assert_that(notebook.cell_output_text(15)).contains(spark_dir_name)
-    assert_that(os.path.isdir(spark_dir_name))
-
-    # User info
-    assert_that(notebook.cell_output_text(16)).contains(
-        f"Extracted Spark distribution in {os.path.abspath(spark_dir_name)}"
-    )
-    assert_that(spark_dir).is_equal_to(os.path.abspath(spark_dir_name))
-
-    # Check SPARK_HOME
-    assert_that(notebook.cell_output_text(18)).is_equal_to(spark_dir)
-
     # Iceberg version
-    assert_that(notebook.cell_output_text(22)).is_equal_to(
+    assert_that(notebook.cell_output_text(6)).is_equal_to(
         f"Using Iceberg version {demo.get_iceberg_version()}"
     )
 
     # Spark packages
-    assert_that(notebook.cell_output_text(24)).is_equal_to(
+    assert_that(notebook.cell_output_text(8)).is_equal_to(
         f"org.apache.iceberg:iceberg-spark3-runtime:{demo.get_iceberg_version()}"
     )
 
     # Nessie URI
-    assert_that(notebook.cell_output_text(26)).is_equal_to(demo.get_nessie_api_uri())
+    assert_that(notebook.cell_output_text(10)).is_equal_to(demo.get_nessie_api_uri())
