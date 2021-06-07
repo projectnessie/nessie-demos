@@ -61,7 +61,7 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     # assert_that(notebook.cell_output_text(8)).is_equal_to(salaries)
     # this is just a workaround because to_pandas() output somehow isn't
     # returned by notebook.cell_output_text(8)
-    assert_that(notebook.nb["cells"][8].outputs[0]["data"]["text/plain"]).contains(
+    assert_that(notebook.cell_output_text(8)).contains(
         "2007-08   Los Angeles Lakers  $19490625     Kobe Bryant"
     )
 
@@ -79,7 +79,7 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     # table_env.from_path('nessie.nba.`allstar_games_stats@etl`').to_pandas()
     # assert_that(notebook.cell_output_text(22)).is_equal_to(
     #    "fixme_pandas_output_isnt_shown")
-    assert_that(notebook.nb["cells"][22].outputs[0]["data"]["text/plain"]).contains(
+    assert_that(notebook.cell_output_text(22)).contains(
         "1997-98   19   LAL    2    6    1    2    0    1   1   18     Kobe Bryant"
     )
 
@@ -109,14 +109,10 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     )
 
     # table_env.from_path('nessie.nba.`salaries@experiment`').select(lit(1).count).to_pandas()
-    assert_that(notebook.nb["cells"][34].outputs[0]["data"]["text/plain"]).contains(
-        "59"
-    )
+    assert_that(notebook.cell_output_text(34)).contains("59")
 
     # table_env.from_path('nessie.nba.`salaries@main`').select(lit(1).count).to_pandas()
-    assert_that(notebook.nb["cells"][36].outputs[0]["data"]["text/plain"]).contains(
-        "55"
-    )
+    assert_that(notebook.cell_output_text(36)).contains("55")
 
 
 @pytest.mark.skip("Skipped until we get a new Iceberg release")
