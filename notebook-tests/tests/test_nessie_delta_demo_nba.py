@@ -27,43 +27,63 @@ from testbook.client import TestbookNotebookClient
 from tests import _find_notebook
 
 
-salaries = """+-------+-------------------+---------+--------------+
-| Season|               Team|   Salary|        Player|
-+-------+-------------------+---------+--------------+
-|2003-04|Cleveland Cavaliers| $4018920|  Lebron James|
-|2004-05|Cleveland Cavaliers| $4320360|  Lebron James|
-|2005-06|Cleveland Cavaliers| $4621800|  Lebron James|
-|2006-07|Cleveland Cavaliers| $5828090|  Lebron James|
-|2007-08|Cleveland Cavaliers|$13041250|  Lebron James|
-|2008-09|Cleveland Cavaliers|$14410581|  Lebron James|
-|2009-10|Cleveland Cavaliers|$15779912|  Lebron James|
-|2010-11|         Miami Heat|$14500000|  Lebron James|
-|2011-12|         Miami Heat|$16022500|  Lebron James|
-|2012-13|         Miami Heat|$17545000|  Lebron James|
-|2013-14|         Miami Heat|$19067500|  Lebron James|
-|2014-15|Cleveland Cavaliers|$20644400|  Lebron James|
-|2015-16|Cleveland Cavaliers|$22971000|  Lebron James|
-|2016-17|Cleveland Cavaliers|$30963450|  Lebron James|
-|2017-18|Cleveland Cavaliers|$33285709|  Lebron James|
-|1984-85|      Chicago Bulls|  $550000|Michael Jordan|
-|1985-86|      Chicago Bulls|  $630000|Michael Jordan|
-|1987-88|      Chicago Bulls|  $845000|Michael Jordan|
-|1988-89|      Chicago Bulls| $2000000|Michael Jordan|
-|1989-90|      Chicago Bulls| $2500000|Michael Jordan|
-+-------+-------------------+---------+--------------+
-only showing top 20 rows"""
+salaries = """Season                 Team     Salary          Player
+0   2003-04  Cleveland Cavaliers   $4018920    Lebron James
+1   2004-05  Cleveland Cavaliers   $4320360    Lebron James
+2   2005-06  Cleveland Cavaliers   $4621800    Lebron James
+3   2006-07  Cleveland Cavaliers   $5828090    Lebron James
+4   2007-08  Cleveland Cavaliers  $13041250    Lebron James
+5   2008-09  Cleveland Cavaliers  $14410581    Lebron James
+6   2009-10  Cleveland Cavaliers  $15779912    Lebron James
+7   2010-11           Miami Heat  $14500000    Lebron James
+8   2011-12           Miami Heat  $16022500    Lebron James
+9   2012-13           Miami Heat  $17545000    Lebron James
+10  2013-14           Miami Heat  $19067500    Lebron James
+11  2014-15  Cleveland Cavaliers  $20644400    Lebron James
+12  2015-16  Cleveland Cavaliers  $22971000    Lebron James
+13  2016-17  Cleveland Cavaliers  $30963450    Lebron James
+14  2017-18  Cleveland Cavaliers  $33285709    Lebron James
+15  1984-85        Chicago Bulls    $550000  Michael Jordan
+16  1985-86        Chicago Bulls    $630000  Michael Jordan
+17  1987-88        Chicago Bulls    $845000  Michael Jordan
+18  1988-89        Chicago Bulls   $2000000  Michael Jordan
+19  1989-90        Chicago Bulls   $2500000  Michael Jordan
+20  1990-91        Chicago Bulls   $2500000  Michael Jordan
+21  1991-92        Chicago Bulls   $3250000  Michael Jordan
+22  1992-93        Chicago Bulls   $4000000  Michael Jordan
+23  1993-94        Chicago Bulls   $4000000  Michael Jordan
+24  1994-95        Chicago Bulls   $3850000  Michael Jordan
+25  1995-96        Chicago Bulls   $3850000  Michael Jordan
+26  1996-97        Chicago Bulls  $30140000  Michael Jordan
+27  1997-98        Chicago Bulls  $33140000  Michael Jordan
+28  2001-02   Washington Wizards   $1000000  Michael Jordan
+29  2002-03   Washington Wizards   $1030000  Michael Jordan
+30  1996-97   Los Angeles Lakers   $1015000     Kobe Bryant
+31  1997-98   Los Angeles Lakers   $1167240     Kobe Bryant
+32  1998-99   Los Angeles Lakers   $1319000     Kobe Bryant
+33  1999-00   Los Angeles Lakers   $9000000     Kobe Bryant
+34  2000-01   Los Angeles Lakers  $10130000     Kobe Bryant
+35  2001-02   Los Angeles Lakers  $11250000     Kobe Bryant
+36  2002-03   Los Angeles Lakers  $12375000     Kobe Bryant
+37  2003-04   Los Angeles Lakers  $13500000     Kobe Bryant
+38  2004-05   Los Angeles Lakers  $14175000     Kobe Bryant
+39  2005-06   Los Angeles Lakers  $15946875     Kobe Bryant
+40  2006-07   Los Angeles Lakers  $17718750     Kobe Bryant
+41  2007-08   Los Angeles Lakers  $19490625     Kobe Bryant
+42  2008-09   Los Angeles Lakers  $21262500     Kobe Bryant
+43  2009-10   Los Angeles Lakers  $23034375     Kobe Bryant
+44  2010-11   Los Angeles Lakers  $24806250     Kobe Bryant
+45  2011-12   Los Angeles Lakers  $25244493     Kobe Bryant
+46  2012-13   Los Angeles Lakers  $27849149     Kobe Bryant
+47  2013-14   Los Angeles Lakers  $30453805     Kobe Bryant
+48  2014-15   Los Angeles Lakers  $23500000     Kobe Bryant
+49  2015-16   Los Angeles Lakers  $25000000     Kobe Bryant"""
 
-num_salaries_on_experiment = """+--------+
-|count(1)|
-+--------+
-|      58|
-+--------+"""
+num_salaries_on_experiment = """count(1)
+0        58"""
 
-num_salaries_on_main = """+--------+
-|count(1)|
-+--------+
-|      54|
-+--------+"""
+num_salaries_on_main = """count(1)
+0        54"""
 
 
 @pytest.fixture(scope="module")
