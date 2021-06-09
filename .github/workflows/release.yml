@@ -25,7 +25,7 @@ on:
   workflow_dispatch:
     inputs:
       versionBump:
-        description: 'Type of version bump - one of: path, minor, major'
+        description: 'Type of version bump - one of: patch, minor, major'
         required: true
         default: patch
 
