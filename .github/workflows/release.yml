@@ -46,6 +46,10 @@ jobs:
         echo ${{ secrets.GITHUB_TOKEN }} | gh auth login --with-token
         gh api repos/projectnessie/nessie-demos/commits/${GITHUB_SHA}/check-runs --jq 'if ([.check_runs[] | select(.name | endswith("elease") | not ) | .conclusion] | unique == ["success"]) then "OK" else error("Commit checks are not OK") end'
 
+    - name: Generate settings.xml for Maven Builds
+      uses: whelk-io/maven-settings-xml-action@v17
+      with:
+        repositories: '[{ "id": "github", "name": "Nessie Delta custom Repository", "url": "https://storage.googleapis.com/nessie-maven" }]'
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2

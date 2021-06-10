@@ -33,6 +33,10 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
 
     steps:
+    - name: Generate settings.xml for Maven Builds
+      uses: whelk-io/maven-settings-xml-action@v17
+      with:
+        repositories: '[{ "id": "github", "name": "Nessie Delta custom Repository", "url": "https://storage.googleapis.com/nessie-maven" }]'
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
