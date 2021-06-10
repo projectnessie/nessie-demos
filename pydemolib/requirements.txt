@@ -15,3 +15,5 @@
 #
 PyYAML>=5.4.0
 requests>=2.23.0
+# this fixes pandas output in Google Colab
+pandas-profiling>=3.0.0
