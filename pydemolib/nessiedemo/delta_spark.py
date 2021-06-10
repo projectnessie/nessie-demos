@@ -69,6 +69,8 @@ class NessieDemoDeltaSpark(NessieDemoSparkSupport):
         endpoint = self._get_demo().get_nessie_api_uri()
 
         conf.set("spark.jars.packages", spark_jars)
+        # this is where our custom Delta version is being published to
+        conf.set("spark.jars.repositories", "https://storage.googleapis.com/nessie-maven")
         conf.set(
             "spark.sql.extensions",
             "io.delta.sql.DeltaSparkSessionExtension",

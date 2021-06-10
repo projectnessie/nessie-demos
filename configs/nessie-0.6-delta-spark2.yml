@@ -19,9 +19,7 @@
 # NOTE: Requires Python 3.7 - newer Python version don't work with pyspark 2.4 !
 
 versions:
-  nessie: 0.6.1-SNAPSHOT
-
-nessie_runner: /home/snazy/devel/projectnessie/nessie/master/servers/quarkus-server/target/nessie-quarkus-0.6.1-SNAPSHOT-runner
+  nessie: 0.6.1
 
 python_dependencies:
   - setuptools>=56.2.0  # required to successfully install pyspark in older envs due to pandoc install issues

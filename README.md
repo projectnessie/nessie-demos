@@ -8,6 +8,9 @@ Below is a list of working Jupyter notebooks, which can be run either on [Google
 * Nessie-Iceberg-NBA Jupyter Notebook
     * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-iceberg-demo-nba.ipynb)
     * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-iceberg-demo-nba.ipynb)
+* Nessie-Deltalake-NBA Jupyter Notebook
+  * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-delta-demo-nba.ipynb)
+  * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-delta-demo-nba.ipynb)
 * How to setup Pyspark/Spark + Iceberg for Nessie
     * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-iceberg-spark-setup.ipynb)
     * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-iceberg-spark-setup.ipynb)
@@ -15,7 +18,6 @@ Below is a list of working Jupyter notebooks, which can be run either on [Google
 Upcoming Jupyter notebooks are shown below:
 
 * Notebooks for Nessie w/ Flink+Iceberg
-* Notebooks for Nessie w/ Deltalake
 
 ## Directory structure
 

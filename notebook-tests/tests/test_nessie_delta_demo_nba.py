@@ -99,7 +99,6 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
         yield tb
 
 
-@pytest.mark.skip("Skipped until necessary Nessie PR is in")
 def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     """Runs throuhg the entire notebook and checks the output.
 
@@ -169,7 +168,6 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     assert_that(notebook.cell_output_text(34)).is_equal_to(num_salaries_on_main)
 
 
-@pytest.mark.skip("Skipped until necessary Nessie PR is in")
 def test_dependency_setup(notebook: TestbookNotebookClient) -> None:
     """Verifies that dependencies were correctly set up.
 
@@ -182,7 +180,6 @@ def test_dependency_setup(notebook: TestbookNotebookClient) -> None:
     assert_that(demo_delta_spark).is_not_none()
 
 
-@pytest.mark.skip("Skipped until necessary Nessie PR is in")
 def test_dataset_exists(notebook: TestbookNotebookClient) -> None:
     """Verifies that the NBA dataset exists.
 

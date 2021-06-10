@@ -17,9 +17,7 @@
 # Nessie-Demo config-yaml to run demos against Nessie 0.6 for Delta w/ Spark 3
 
 versions:
-  nessie: 0.6.1-SNAPSHOT
-
-nessie_runner: /home/snazy/devel/projectnessie/nessie/master/servers/quarkus-server/target/nessie-quarkus-0.6.1-SNAPSHOT-runner
+  nessie: 0.6.1
 
 python_dependencies:
   - pynessie==0.6.0
