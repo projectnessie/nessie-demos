@@ -38,6 +38,4 @@ versions:
 python_dependencies:
   - findspark==1.4.2
   - pyspark==3.1.1
-  - pandas==1.2.4
-  - pyarrow==4.0.0
   - pynessie==0.6.0

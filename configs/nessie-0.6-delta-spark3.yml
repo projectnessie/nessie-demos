@@ -23,5 +23,3 @@ python_dependencies:
   - pynessie==0.6.0
   - findspark==1.4.2
   - pyspark==3.0.2
-  - pandas==1.2.4
-  - pyarrow==4.0.0

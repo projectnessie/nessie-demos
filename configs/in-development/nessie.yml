@@ -44,8 +44,6 @@ versions:
 python_dependencies:
   - findspark==1.4.2
   - pyspark==3.0.2
-  - pandas==1.2.4
-  - pyarrow==4.0.0
 
 python_dependencies_reinstall:
   - !env NESSIE_DEMO_IN_DEV_PYNESSIE_PATH
