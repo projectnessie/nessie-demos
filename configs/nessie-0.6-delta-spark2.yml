@@ -23,7 +23,7 @@ versions:
 
 python_dependencies:
   - setuptools>=56.2.0  # required to successfully install pyspark in older envs due to pandoc install issues
-  - pynessie==0.6.0
+  - pynessie==0.6.1
   - findspark==1.4.2
   - pyspark==2.4.2
 
