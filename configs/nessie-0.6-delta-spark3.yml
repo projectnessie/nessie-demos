@@ -20,6 +20,6 @@ versions:
   nessie: 0.6.1
 
 python_dependencies:
-  - pynessie==0.6.0
+  - pynessie==0.6.1
   - findspark==1.4.2
   - pyspark==3.0.2
