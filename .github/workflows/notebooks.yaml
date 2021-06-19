@@ -16,7 +16,24 @@
 
 name: Testing Jupyter Notebooks
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'LICENSE'
+      - '*.md'
+      - '**/*.md'
+      - '.github/dependabot.yml'
+      - '.github/workflows/release.yml'
+      - '.idea/**'
+  pull_request:
+    paths-ignore:
+      - 'LICENSE'
+      - '*.md'
+      - '**/*.md'
+      - '.github/dependabot.yml'
+      - '.github/workflows/release.yml'
+      - '.idea/**'
 
 jobs:
   python:
