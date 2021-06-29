@@ -22,4 +22,4 @@ versions:
 python_dependencies:
   - pynessie==0.6.1
   - findspark==1.4.2
-  - pyspark==3.0.2
+  - pyspark==3.0.3

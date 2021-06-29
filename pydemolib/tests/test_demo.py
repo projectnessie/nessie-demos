@@ -44,7 +44,7 @@ class TestNessieDemo:
 
         assert demo.get_nessie_version() == "0.5.1"
         assert demo.get_iceberg_version() == "0.11.1"
-        assert "pyspark==3.0.2" in demo._get_versions_dict()["python_dependencies"]
+        assert "pyspark==3.0.3" in demo._get_versions_dict()["python_dependencies"]
 
         ds_nba = demo.fetch_dataset("nba")
         assert len(ds_nba) == 3

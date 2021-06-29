@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 #
-# Nessie-Demo config-yaml to run demos against Nessie 0.5.1 and Iceberg 0.11.1 using Spark 3.0.2
+# Nessie-Demo config-yaml to run demos against Nessie 0.5.1 and Iceberg 0.11.1 using Spark 3.0.3
 
 versions:
   nessie: 0.5.1
@@ -23,7 +23,7 @@ versions:
 python_dependencies:
   - pynessie==0.5.1
   - findspark==1.4.2
-  - pyspark==3.0.2
+  - pyspark==3.0.3
 
 spark:
-  tarball: https://downloads.apache.org/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz
+  tarball: https://downloads.apache.org/spark/spark-3.0.3/spark-3.0.3-bin-hadoop2.7.tgz
