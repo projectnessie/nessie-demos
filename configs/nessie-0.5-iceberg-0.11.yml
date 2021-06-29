@@ -26,4 +26,4 @@ python_dependencies:
   - pyspark==3.0.2
 
 spark:
-  tarball: https://downloads.apache.org/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz
+  tarball: https://archive.apache.org/dist/spark/spark-3.0.2/spark-3.0.2-bin-hadoop2.7.tgz
