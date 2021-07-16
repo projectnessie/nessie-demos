@@ -68,7 +68,7 @@ class NessieDemoIcebergSpark(NessieDemoSparkSupport):
             "spark.sql.catalog.{}.catalog-impl".format(catalog_name),
             "org.apache.iceberg.nessie.NessieCatalog",
         )
-        conf.set("spark.sql.catalog.{}.auth_type".format(catalog_name), "NONE")
+        conf.set("spark.sql.catalog.{}.auth-type".format(catalog_name), "NONE")
         conf.set("spark.sql.catalog.{}.cache-enabled".format(catalog_name), "false")
         conf.set("spark.sql.catalog.{}".format(catalog_name), "org.apache.iceberg.spark.SparkCatalog")
         conf.set(
