@@ -80,7 +80,7 @@ class NessieDemoDeltaSpark(NessieDemoSparkSupport):
         conf.set("spark.hadoop.fs.defaultFS", "file://{}/fs".format(self.get_spark_warehouse()))
         conf.set("spark.hadoop.nessie.url", endpoint)
         conf.set("spark.hadoop.nessie.ref", nessie_ref)
-        conf.set("spark.hadoop.nessie.auth_type", "NONE")
+        conf.set("spark.hadoop.nessie.auth-type", "NONE")
         conf.set("spark.hadoop.nessie.cache-enabled", "false")
         conf.set(
             "spark.sql.catalog.spark_catalog",
