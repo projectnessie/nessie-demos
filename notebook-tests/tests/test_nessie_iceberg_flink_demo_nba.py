@@ -28,7 +28,6 @@ from tests import _find_notebook
 
 
 @pytest.fixture(scope="module")
-@pytest.mark.skip("Skipped until we get a new Iceberg release")
 def notebook(tmpdir_factory: TempPathFactory) -> Generator:
     """Prepares nessiedemo env and yields `testbook`."""
     tmpdir = str(tmpdir_factory.mktemp("_assets"))
@@ -41,7 +40,6 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
         yield tb
 
 
-@pytest.mark.skip("Skipped until we get a new Iceberg release")
 def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     """Runs through the entire notebook and checks the output.
 
@@ -115,7 +113,6 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     assert_that(notebook.cell_output_text(36)).contains("55")
 
 
-@pytest.mark.skip("Skipped until we get a new Iceberg release")
 def test_dependency_setup(notebook: TestbookNotebookClient) -> None:
     """Verifies that dependencies were correctly set up.
 
@@ -128,7 +125,6 @@ def test_dependency_setup(notebook: TestbookNotebookClient) -> None:
     assert_that(demo_flink).is_not_none()
 
 
-@pytest.mark.skip("Skipped until we get a new Iceberg release")
 def test_dataset_exists(notebook: TestbookNotebookClient) -> None:
     """Verifies that the NBA dataset exists.
 

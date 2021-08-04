@@ -14,10 +14,10 @@ Below is a list of working Jupyter notebooks, which can be run either on [Google
 * How to setup Pyspark/Spark + Iceberg for Nessie
     * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-iceberg-spark-setup.ipynb)
     * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-iceberg-spark-setup.ipynb)
+* Nessie-Iceberg with Flink Jupyter Notebook
+  * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-iceberg-flink-demo-nba.ipynb)
+  * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-iceberg-flink-demo-nba.ipynb)
 
-Upcoming Jupyter notebooks are shown below:
-
-* Notebooks for Nessie w/ Flink+Iceberg
 
 ## Directory structure
 

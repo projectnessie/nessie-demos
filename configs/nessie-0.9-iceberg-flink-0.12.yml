@@ -14,14 +14,14 @@
 # limitations under the License.
 #
 #
-# Nessie-Demo config-yaml to run demos against Nessie 0.6.0 and Iceberg 0.12.x using Flink
+# Nessie-Demo config-yaml to run demos against Nessie 0.9.0 and Iceberg 0.12.x using Flink
 
 versions:
-  nessie: 0.6.0
+  nessie: 0.9.0
   iceberg: 0.12.0
 
 python_dependencies:
-  - pynessie==0.6.0
+  - pynessie==0.9.0
   - apache-flink==1.12.1
 
 hadoop:

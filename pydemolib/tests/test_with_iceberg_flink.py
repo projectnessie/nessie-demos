@@ -168,4 +168,4 @@ class TestWithIcebergFlink:
     @pytest.mark.forked
     def test_with_iceberg_flink(self: object) -> None:
         """Test NessieDemo+Iceberg+Flink against Nessie 0.6.x + Iceberg 0.12.x."""
-        TestWithIcebergFlink.__test_with_iceberg_flink("in-development/nessie-0.6-iceberg-flink-0.12.yml", [])
+        TestWithIcebergFlink.__test_with_iceberg_flink("nessie-0.9-iceberg-flink-0.12.yml", [])
