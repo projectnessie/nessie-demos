@@ -2,6 +2,9 @@
 
 nohup ./nessie-quarkus-runner &
 
-export SPARK_HOME=$PWD/spark-3.0.3-bin-hadoop3.2
-export HADOOP_HOME=$PWD/hadoop-2.10.1
+SPARK_VERSION=`python -c "import notebooks.tests;print(notebooks.tests._SPARK_VERSION)"`
+HADOOP_VERSION=`python -c "import notebooks.tests;print(notebooks.tests._HADOOP_VERSION)"`
+
+export SPARK_HOME=$PWD/spark-$SPARK_VERSION-bin-hadoop3.2
+export HADOOP_HOME=$PWD/hadoop-$HADOOP_VERSION
 exec "$@"
