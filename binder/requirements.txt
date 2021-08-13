@@ -1,0 +1,4 @@
+pynessie==0.9.0
+pyspark==3.0.3
+findspark
+pandas
