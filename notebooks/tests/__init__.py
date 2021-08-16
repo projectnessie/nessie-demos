@@ -17,11 +17,12 @@
 #
 """Unit tests for demo notebooks."""
 import os
+import site
 import stat
-import subprocess
+import subprocess  # noqa: S404
 import sysconfig
 import tarfile
-import site
+from typing import Any
 from typing import Optional
 
 import requests
@@ -61,24 +62,29 @@ def _get_unzip(filename: str, url: str) -> None:
 
 
 def fetch_spark() -> None:
+    """Download and unzip Spark."""
     _get_unzip(_SPARK_FILENAME, _SPARK_URL)
-    os.environ['SPARK_HOME'] = os.path.join(os.getcwd(), _SPARK_FILENAME)
+    os.environ["SPARK_HOME"] = os.path.join(os.getcwd(), _SPARK_FILENAME)
 
 
 def _get_hadoop() -> None:
     _get_unzip(_HADOOP_FILENAME, _HADOOP_URL)
-    os.environ['HADOOP_HOME'] = os.path.join(os.getcwd(), _HADOOP_FILENAME)
+    os.environ["HADOOP_HOME"] = os.path.join(os.getcwd(), _HADOOP_FILENAME)
 
 
 def _copy_all_hadoop_jars_to_pyflink() -> None:
     _get_hadoop()
     if not os.getenv("HADOOP_HOME"):
-        raise Exception("The HADOOP_HOME env var must be set and point to a valid Hadoop installation")
+        raise Exception(
+            "The HADOOP_HOME env var must be set and point to a valid Hadoop installation"
+        )
 
     pyflink_lib_dir = _find_pyflink_lib_dir()
-    for i, jar in enumerate(_jar_files()):
+    for _i, jar in enumerate(_jar_files()):
         os.link(jar, pyflink_lib_dir)
-    print(f"Copyied {i} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}")
+    print(
+        f"Copyied {_i} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}"
+    )
 
 
 def _find_pyflink_lib_dir() -> Optional[str]:
@@ -96,25 +102,30 @@ def _jar_files() -> str:
                 yield os.path.join(root, file)
 
 
-def _get(filename, url) -> None:
+def _get(filename: str, url: str) -> None:
     if os.path.exists(filename):
         return filename
     r = requests.get(url)
-    with open(filename, 'wb') as f:
+    with open(filename, "wb") as f:
         f.write(r.content)
 
 
 def fetch_nessie() -> str:
+    """Download nessie executable."""
     runner = "nessie-quarkus-runner"
     import pynessie
+
     version = pynessie.__version__
-    url = "https://github.com/projectnessie/nessie/releases/download/nessie-{}/nessie-quarkus-{}-runner".format(version, version)
+    url = "https://github.com/projectnessie/nessie/releases/download/nessie-{}/nessie-quarkus-{}-runner".format(
+        version, version
+    )
     _get(runner, url)
     os.chmod(runner, os.stat(runner).st_mode | stat.S_IXUSR)
     return runner
 
 
 def fetch_iceberg_flink() -> str:
+    """Download flink jar for iceberg."""
     filename = _ICEBERG_FLINK_FILENAME
     url = _ICEBERG_FLINK_URL
     _get(filename, url)
@@ -122,14 +133,19 @@ def fetch_iceberg_flink() -> str:
 
 
 def start_nessie() -> None:
+    """Context for starting and stopping a nessie binary."""
     runner = fetch_nessie()
 
     class NessieRunner:
-        def __enter__(self):
-            self._p = subprocess.Popen(['./'+runner], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        def __enter__(self: "NessieRunner") -> subprocess.Popen:
+            self._p = subprocess.Popen(  # noqa: S603
+                ["./" + runner], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            )
             return self._p
 
-        def __exit__(self, exc_type, exc_val, exc_tb):
+        def __exit__(
+            self: "NessieRunner", exc_type: Any, exc_val: Any, exc_tb: Any
+        ) -> None:
             self._p.kill()
 
     return NessieRunner()

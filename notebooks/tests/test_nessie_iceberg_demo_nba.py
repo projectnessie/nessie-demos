@@ -16,14 +16,18 @@
 # limitations under the License.
 #
 """Tests the Nessie + Iceberg + Spark Jupyter Notebook with the NBA dataset."""
-from typing import Any, Generator
+from typing import Any
+from typing import Generator
 
 import pytest
 from _pytest.tmpdir import TempPathFactory
 from assertpy import assert_that
 from testbook import testbook
 from testbook.client import TestbookNotebookClient
-from . import _find_notebook, start_nessie, fetch_spark
+
+from . import _find_notebook
+from . import fetch_spark
+from . import start_nessie
 
 num_salaries_on_experiment = """count(1)
 0        58"""
@@ -34,10 +38,11 @@ num_salaries_on_main = """count(1)
 
 @pytest.fixture(scope="module")
 def notebook(tmpdir_factory: TempPathFactory) -> Generator:
+    """Pytest fixture to run a notebook."""
     path_to_notebook = _find_notebook("nessie-iceberg-demo-nba.ipynb")
     fetch_spark()
 
-    with start_nessie() as nessie:
+    with start_nessie() as _:
         with testbook(path_to_notebook, timeout=300) as tb:
             tb.execute()
             yield tb
@@ -64,13 +69,17 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
 
     assertion("findspark.init").contains("Spark Running")
 
-    assertion("CREATE BRANCH dev IN dev_catalog AS main").contains("Branch").contains("dev")
+    assertion("CREATE BRANCH dev IN dev_catalog AS main").contains("Branch").contains(
+        "dev"
+    )
 
     assertion(
-        'INSERT INTO dev_catalog.nba.totals_stats SELECT * FROM stats_table'
-    ).is_equal_to('Empty DataFrame\nColumns: []\nIndex: []')
+        "INSERT INTO dev_catalog.nba.totals_stats SELECT * FROM stats_table"
+    ).is_equal_to("Empty DataFrame\nColumns: []\nIndex: []")
 
-    assertion_counted("LIST REFERENCES IN dev_catalog", 1).contains("main").contains("dev").contains("Branch")
+    assertion_counted("LIST REFERENCES IN dev_catalog", 1).contains("main").contains(
+        "dev"
+    ).contains("Branch")
 
     assertion(
         'spark.sql("select count(*) from dev_catalog.nba.`salaries@experiment`").toPandas()'
