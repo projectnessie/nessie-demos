@@ -1,0 +1,16 @@
+#!/bin/bash
+
+python --version
+source /srv/conda/etc/profile.d/conda.sh
+conda create -n flink-demo pandas ipykernel requests python==3.7.10
+conda activate flink-demo
+pip install apache-flink==1.12.1 pynessie==0.9.0
+python -m ipykernel install --name "flink-demo" --user
+python -c "import notebooks.tests;notebooks.tests._copy_all_hadoop_jars_to_pyflink()"
+conda deactivate
+
+python -c "import notebooks.tests;notebooks.tests.fetch_nessie()"
+
+python -c "import notebooks.tests;notebooks.tests.fetch_spark()"
+
+python -c "import notebooks.tests;notebooks.tests.fetch_iceberg_flink()"
