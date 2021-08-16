@@ -17,9 +17,10 @@
 #
 """Unit tests for demo notebooks."""
 import os
+import stat
 import subprocess
+import sysconfig
 import tarfile
-import shutil
 import site
 from typing import Optional
 
@@ -55,22 +56,18 @@ def _find_notebook(notebook_file: str) -> str:
 def _get_unzip(filename: str, url: str) -> None:
     if not os.path.exists(filename):
         response = requests.get(url, stream=True)
-        file = tarfile.open(fileobj=response.raw, mode="r|gz")
-        file.extractall(path=".")
+        with tarfile.open(fileobj=response.raw, mode="r|gz") as file:
+            file.extractall(path=".")
 
 
-def _get_spark() -> None:
-    filename = _SPARK_FILENAME
-    url = _SPARK_URL
-    _get_unzip(filename, url)
-    os.environ['SPARK_HOME'] = os.path.join(os.getcwd(), filename)
+def fetch_spark() -> None:
+    _get_unzip(_SPARK_FILENAME, _SPARK_URL)
+    os.environ['SPARK_HOME'] = os.path.join(os.getcwd(), _SPARK_FILENAME)
 
 
 def _get_hadoop() -> None:
-    filename = _HADOOP_FILENAME
-    url = _HADOOP_URL
-    _get_unzip(filename, url)
-    os.environ['HADOOP_HOME'] = os.path.join(os.getcwd(), filename)
+    _get_unzip(_HADOOP_FILENAME, _HADOOP_URL)
+    os.environ['HADOOP_HOME'] = os.path.join(os.getcwd(), _HADOOP_FILENAME)
 
 
 def _copy_all_hadoop_jars_to_pyflink() -> None:
@@ -80,12 +77,12 @@ def _copy_all_hadoop_jars_to_pyflink() -> None:
 
     pyflink_lib_dir = _find_pyflink_lib_dir()
     for i, jar in enumerate(_jar_files()):
-        shutil.copy(jar, pyflink_lib_dir)
+        os.link(jar, pyflink_lib_dir)
     print(f"Copyied {i} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}")
 
 
 def _find_pyflink_lib_dir() -> Optional[str]:
-    for dir in site.getsitepackages():
+    for dir in site.getsitepackages() + [sysconfig.get_paths()["purelib"]]:
         package_dir = os.path.join(dir, "pyflink", "lib")
         if os.path.exists(package_dir):
             return package_dir
@@ -113,7 +110,7 @@ def fetch_nessie() -> str:
     version = pynessie.__version__
     url = "https://github.com/projectnessie/nessie/releases/download/nessie-{}/nessie-quarkus-{}-runner".format(version, version)
     _get(runner, url)
-    os.chmod(runner, 0o777)
+    os.chmod(runner, os.stat(runner).st_mode | stat.S_IXUSR)
     return runner
 
 

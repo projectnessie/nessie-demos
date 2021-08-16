@@ -11,6 +11,6 @@ conda deactivate
 
 python -c "import notebooks.tests;notebooks.tests.fetch_nessie()"
 
-python -c "import notebooks.tests;notebooks.tests._get_spark()"
+python -c "import notebooks.tests;notebooks.tests.fetch_spark()"
 
 python -c "import notebooks.tests;notebooks.tests.fetch_iceberg_flink()"
