@@ -17,6 +17,7 @@
 #
 """Unit tests for demo notebooks."""
 import os
+import shutil
 import site
 import stat
 import subprocess  # noqa: S404
@@ -83,7 +84,7 @@ def _copy_all_hadoop_jars_to_pyflink() -> None:
     duplicates = 0
     for _jar_count, jar in enumerate(_jar_files()):
         try:
-            os.link(jar, pyflink_lib_dir)
+            shutil.copyfile(jar, pyflink_lib_dir)
         except FileExistsError:
             duplicates += 1
             print(f"Duplicate jar {jar}")
