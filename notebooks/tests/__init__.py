@@ -84,7 +84,7 @@ def _copy_all_hadoop_jars_to_pyflink() -> None:
     duplicates = 0
     for _jar_count, jar in enumerate(_jar_files()):
         try:
-            shutil.copyfile(jar, pyflink_lib_dir)
+            shutil.copy(jar, pyflink_lib_dir)
         except FileExistsError:
             duplicates += 1
             print(f"Duplicate jar {jar}")
