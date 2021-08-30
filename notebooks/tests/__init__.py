@@ -32,11 +32,12 @@ try:
     import pyspark
 
     _SPARK_VERSION = pyspark.__version__
+    _SPARK_FILENAME = f"spark-{_SPARK_VERSION}-bin-hadoop3.2"
+    _SPARK_URL = f"https://archive.apache.org/dist/spark/spark-{_SPARK_VERSION}/{_SPARK_FILENAME}.tgz"
 except ImportError:
-    _SPARK_VERSION = "3.1.2"
-
-_SPARK_FILENAME = f"spark-{_SPARK_VERSION}-bin-hadoop3.2"
-_SPARK_URL = f"https://archive.apache.org/dist/spark/spark-{_SPARK_VERSION}/{_SPARK_FILENAME}.tgz"
+    _SPARK_VERSION = None
+    _SPARK_FILENAME = None
+    _SPARK_URL = None
 
 _HADOOP_VERSION = "2.10.1"
 _HADOOP_FILENAME = f"hadoop-{_HADOOP_VERSION}"
@@ -69,6 +70,10 @@ def _get_unzip(filename: str, url: str) -> None:
 
 def fetch_spark() -> None:
     """Download and unzip Spark."""
+    if not _SPARK_VERSION:
+        raise NotImplementedError(
+            "Can't download spark as pyspark hasn't been installed."
+        )
     _get_unzip(_SPARK_FILENAME, _SPARK_URL)
     os.environ["SPARK_HOME"] = os.path.join(os.getcwd(), _SPARK_FILENAME)
 
