@@ -28,8 +28,13 @@ from typing import Optional
 
 import requests
 
+try:
+    import pyspark
 
-_SPARK_VERSION = "3.0.3"
+    _SPARK_VERSION = pyspark.__version__
+except ImportError:
+    _SPARK_VERSION = "3.1.2"
+
 _SPARK_FILENAME = f"spark-{_SPARK_VERSION}-bin-hadoop3.2"
 _SPARK_URL = f"https://archive.apache.org/dist/spark/spark-{_SPARK_VERSION}/{_SPARK_FILENAME}.tgz"
 

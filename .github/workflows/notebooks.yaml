@@ -69,6 +69,3 @@ jobs:
       - name: Test Notebooks with Tox
         working-directory: notebooks/tests
         run: tox
-      - name: Test Notebooks with Tox
-        working-directory: notebooks/tests
-        run: tox
