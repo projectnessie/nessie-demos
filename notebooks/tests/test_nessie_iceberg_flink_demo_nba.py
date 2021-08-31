@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 """Tests the Nessie + Iceberg + Spark Jupyter Notebook with the NBA dataset."""
+import os
+from pathlib import Path
 from typing import Any
 from typing import Generator
 
@@ -42,7 +44,10 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
     """Pytest fixture to run a notebook."""
     path_to_notebook = _find_notebook("nessie-iceberg-flink-demo-nba.ipynb")
     _copy_all_hadoop_jars_to_pyflink()
-    fetch_iceberg_flink()
+    flink_filename = fetch_iceberg_flink()
+    p = Path(flink_filename).absolute()
+    parent_dir = p.parents[1]
+    p.rename(parent_dir / p.name)
 
     with start_nessie() as _:
         with testbook(path_to_notebook, timeout=360) as tb:
