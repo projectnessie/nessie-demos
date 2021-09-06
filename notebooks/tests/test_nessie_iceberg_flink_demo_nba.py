@@ -16,7 +16,6 @@
 # limitations under the License.
 #
 """Tests the Nessie + Iceberg + Spark Jupyter Notebook with the NBA dataset."""
-import os
 from pathlib import Path
 from typing import Any
 from typing import Generator
