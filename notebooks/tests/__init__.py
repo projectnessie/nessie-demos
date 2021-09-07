@@ -23,7 +23,7 @@ import stat
 import subprocess  # noqa: S404
 import sysconfig
 import tarfile
-from typing import Any
+from contextlib import contextmanager
 from typing import Optional
 
 import requests
@@ -148,20 +148,14 @@ def fetch_iceberg_flink() -> str:
     return filename
 
 
-def start_nessie() -> None:
+@contextmanager
+def start_nessie() -> subprocess.Popen:
     """Context for starting and stopping a nessie binary."""
     runner = fetch_nessie()
-
-    class NessieRunner:
-        def __enter__(self: "NessieRunner") -> subprocess.Popen:
-            self._p = subprocess.Popen(  # noqa: S603
-                ["./" + runner], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-            )
-            return self._p
-
-        def __exit__(
-            self: "NessieRunner", exc_type: Any, exc_val: Any, exc_tb: Any
-        ) -> None:
-            self._p.kill()
-
-    return NessieRunner()
+    try:
+        p = subprocess.Popen(  # noqa: S603
+            ["./" + runner], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        yield p
+    finally:
+        p.kill()
