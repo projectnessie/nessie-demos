@@ -1,61 +1,48 @@
-# Nessie Demos
+# Nessie Binder Demos
 
-[![Main CI](https://github.com/projectnessie/nessie-demos/actions/workflows/main.yml/badge.svg)](https://github.com/projectnessie/nessie-demos/actions/workflows/main.yml)
+These demos run under binder and can be found at:
 
-The purpose of this repo is to provide a set of Jupyter notebooks (which are all unit tested) that show how Nessie can be used with other projects, such as Iceberg/Spark/Flink/Deltalake.
-Below is a list of working Jupyter notebooks, which can be run either on [Google Colab](https://colab.research.google.com/) or on [Binder](https://mybinder.org/):
+* [Spark and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-demo-nba.ipynb)
+* [Spark and Delta](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-delta-demo-nba.ipynb)
+* [Flink and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-flink-demo-nba.ipynb)
 
-* Nessie-Iceberg-NBA Jupyter Notebook
-    * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-iceberg-demo-nba.ipynb)
-    * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-iceberg-demo-nba.ipynb)
-* Nessie-Deltalake-NBA Jupyter Notebook
-  * [Google Colaboratory URL](https://colab.research.google.com/github/projectnessie/nessie-demos/blob/main/colab/nessie-delta-demo-nba.ipynb)
-  * [Binder (mybinder.org)](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=colab%2Fnessie-delta-demo-nba.ipynb)
+The are automatically rebuilt every time we push to main. They are unit tested using `testbook` library to ensure we get
+the correct results as the underlying libraries continue to grow/mature.
 
-Upcoming Jupyter notebooks are shown below:
 
-* Notebooks for Nessie w/ Flink+Iceberg
+## Upgrade instructions
 
-## Directory structure
+Because of the split between Binder and unit tests it wasn't totally trivial to create a single place to update all versions.
+Some versions have to be updated in multiple places:
 
-| directory | purpose |
-| --------- | ------- |
-| `colab/` | Contains unit-testable Jupyter notebooks that can run in Google Colaboratory and Binder.
-| `notebook-tests/` | Contains unit tests  for all Jupyter notebooks from the `colab` directory.
-| `pydemolib/` | Python library that helps to eliminate nearly all boilerplate code in Jupyter notebook based demos. This is not meant to be used in production. See also the disclaimer [here](pydemolib/README.rst).
-| `configs/` | Configuration files that define Nessie, Iceberg, Spark versions and dependencies, supporting demos using different product versions.
-| `datasets/` | Various datasets that can be used by the demos. The nessiedemo Python library in `pydemolib/` supports downloading and accessing these datasets.
-| `/` | Also contains `apt.txt` + `requirements.txt` used by Binder. This `requirements.txt` has nothing to do with the `requirements.txt` in `pydemolib/`.
+### Nessie
 
-## How to add a new Jupyter Notebook Demo?
+Nessie version is set in Binder at `binder/requirements.txt` and for unit tests in `notebooks/tox.ini`. Currently, Iceberg and Delta
+both support only 0.9.x of Nessie.
 
-A new demo will generally require changes in the following places:
-* adding a new notebook under `colab`
-* adding a new config file with the required demo dependencies under `configs`. This new config file is then referenced in `setup_demo("my_new_config.yml", ["nba"])`
-* if the new demo uses a new dataset, then this dataset needs to be added to `datasets` and properly referenced in the notebook: `setup_demo("my_new_config.yml", ["my_new_dataset"])`
-* a new unit test under `notebook-tests/tests`
-* if the new demo requires some dependency setup code that isn't already covered in `pydemolib/nessiedemo`, it will then require a new module under `pydemolib/nessiedemo` with additional tests under `pydemolib/tests`
-The entire demo setup code for the new notebook would then look as shown below:
+### Iceberg
 
-```python
-from nessiedemo.demo import setup_demo
-demo = setup_demo("my_new_config.yml", ["my_new_dataset"])
+Currently we are using Iceberg `0.12.0` and it is specified in both iceberg notebooks as well as `notebooks/tests/__init__.py`
 
-# Downloads and sets up X
-from nessiedemo.new_module_x import x_for_demo
-x = x_for_demo(demo)
-```
+### Delta
 
-## Jupyter notebook environments
+currently Delta version is taken directly from the Nessie version and isn't explicitly noted. It is currently `1.0.0-nessie`
 
-### Google Colaboratory
+### Spark
 
-[Google Colaboratory](https://colab.research.google.com/) provides a Jupyter environment.
-Users basically just provide a URL to a `.ipynb` file, which is then loaded. The runtime
-environment is a container/image that is pre-defined by Google. Changing the base operating
-system and such is not possible. Bumping the pre-installed Python dependencies is not feasible.
+Only has to be updated in `binder/requirements.txt`. Currently Iceberg supports 3.0.x and 3.1.x while delta late supports
+3.1.x only.
 
-### Binder
+### Flink
+
+Flink version is set in Binder at `binder/postBuild` and for unit tests in `notebooks/tox.ini`. Currently, Iceberg supports
+only 1.12.1
+
+### Hadoop
+
+Hadoop libs are used by flink and currently specified in `notebooks/tests/__init__.py` only. We use 2.10.1 with Flink.
+
+## Binder
 
 [Binder](https://mybinder.org) is a more customizable platform for Jupyter notebooks and
 more (see their website). Binder generates a Dockerfile + image based on the settings in the
@@ -63,14 +50,3 @@ source GitHub repository (other sources are possible). It is possible to pre-ins
 e.g. Ubuntu and/or Python packages into the Docker image generated by Binder.
 
 Of course, Binder just lets a user "simply start" a notebook via a simple "click on a link".
-
-## Git history
-
-The history in Git should work the same way as for [Project Nessie repo](https://github.com/projectnessie/nessie/),
-i.e. a linear git history (no merges, no branches, PR-squash-and-merge).
-
-## Compatibility Matrix
-
-| Nessie | Apache Iceberg | Apache Spark | Notes
-| ------ | -------------- | ------------ | -----
-| 0.5.1  | 0.11.1         | 3.0          | Iceberg declares Nessie 0.3.0, but there are no _breaking_ (REST)API changes between Nessie 0.4.0 and 0.5.1

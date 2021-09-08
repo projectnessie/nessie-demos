@@ -20,20 +20,12 @@ on:
   push:
     branches: [ main ]
     paths-ignore:
-      - 'LICENSE'
-      - '*.md'
       - '**/*.md'
       - '.github/dependabot.yml'
-      - '.github/workflows/release.yml'
-      - '.idea/**'
   pull_request:
     paths-ignore:
-      - 'LICENSE'
-      - '*.md'
       - '**/*.md'
       - '.github/dependabot.yml'
-      - '.github/workflows/release.yml'
-      - '.idea/**'
 
 jobs:
   python:
@@ -60,12 +52,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install tox tox-gh-actions build
-      - name: Build nessiedemo
-        working-directory: pydemolib
-        run: python -m build
-      - name: Test with tox
-        working-directory: notebook-tests
-        run: tox
       - name: Test Notebooks with Tox
         working-directory: notebooks/tests
         run: tox
