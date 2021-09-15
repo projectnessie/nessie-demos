@@ -19,7 +19,7 @@ bump2version==1.0.1
 build==0.6.0.post1
 flake8==3.9.2
 ipython
-jupyterlab==3.1.11
+jupyterlab==3.1.12
 pip==21.2.4
 pytest==6.2.5
 pytest-mock==3.6.1
