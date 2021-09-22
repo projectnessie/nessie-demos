@@ -25,6 +25,7 @@ nessie-quarkus-runner
 notebooks/iceberg-flink-runtime-*
 notebooks/hadoop-*
 notebooks/flink-warehouse
+notebooks/nessie_warehouse/
 
 
 # Python venv
