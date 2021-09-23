@@ -46,7 +46,12 @@ _HADOOP_URL = f"https://archive.apache.org/dist/hadoop/common/hadoop-{_HADOOP_VE
 _ICEBERG_VERSION = "0.12.0"
 _ICEBERG_FLINK_FILENAME = f"iceberg-flink-runtime-{_ICEBERG_VERSION}.jar"
 _ICEBERG_FLINK_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime/{_ICEBERG_VERSION}/{_ICEBERG_FLINK_FILENAME}"
+_ICEBERG_HIVE_FILENAME = f"iceberg-hive-runtime-{_ICEBERG_VERSION}.jar"
+_ICEBERG_HIVE_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-hive-runtime/{_ICEBERG_VERSION}/{_ICEBERG_HIVE_FILENAME}"
 
+_HIVE_VERSION  =  "2.3.9"
+_HIVE_FILENAME = f"apache-hive-{_HIVE_VERSION}-bin"
+_HIVE_URL = f"https://apache.mirror.digionline.de/hive/hive-{_HIVE_VERSION}/{_HIVE_FILENAME}.tar.gz"
 
 def _find_notebook(notebook_file: str) -> str:
     path_to_notebook = os.path.join("notebooks", notebook_file)
@@ -148,13 +153,51 @@ def fetch_iceberg_flink() -> str:
     return filename
 
 
+def fetch_hive() -> None:
+    """Download and unzip Hive."""
+    _get_unzip(_HIVE_FILENAME, _HIVE_URL)
+    os.environ["HIVE_HOME"] = os.path.join(os.getcwd(), _HIVE_FILENAME)    
+
+
+def fetch_iceberg_hive() -> str:
+    """Download Hive jar for iceberg."""
+    filename = _ICEBERG_HIVE_FILENAME
+    url = _ICEBERG_HIVE_URL
+    _get(filename, url)
+    return filename    
+
+
+def fetch_hive_with_iceberg_jars() -> None:
+    """Download both Hive and Iceberg Hive jars"""
+    fetch_hive()
+    if not os.getenv("HIVE_HOME"):
+        raise Exception(
+            "The HIVE_HOME env var must be set and point to a valid HiveHadoop installation"
+        )
+
+    hive_auxlib_dir = os.path.join(os.getenv("HIVE_HOME"), "auxlib")
+
+    if not os.path.exists(hive_auxlib_dir):
+        print(f"Folder {hive_auxlib_dir} doesn't exist, creating a new one.")
+        os.mkdir(hive_auxlib_dir)
+
+    iceberg_hive_jar = fetch_iceberg_hive()
+
+    try:
+        shutil.copy(iceberg_hive_jar, hive_auxlib_dir)
+    except FileExistsError:
+        print(f"Jar {iceberg_hive_jar} exists already.")
+
+
+
 @contextmanager
 def start_nessie() -> subprocess.Popen:
     """Context for starting and stopping a nessie binary."""
     runner = fetch_nessie()
     try:
         p = subprocess.Popen(  # noqa: S603
-            ["./" + runner], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            #["./" + runner], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            ["ls"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         yield p
     finally:

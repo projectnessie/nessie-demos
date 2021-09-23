@@ -7,4 +7,9 @@ HADOOP_VERSION=`python -c "import notebooks.tests;print(notebooks.tests._HADOOP_
 
 export SPARK_HOME=$PWD/spark-$SPARK_VERSION-bin-hadoop3.2
 export HADOOP_HOME=$PWD/hadoop-$HADOOP_VERSION
+
+#Start Hive
+chmod +x $PWD/binder/start.hive
+$PWD/binder/start.hive
+
 exec "$@"

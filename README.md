@@ -42,6 +42,11 @@ only 1.12.1
 
 Hadoop libs are used by flink and currently specified in `notebooks/tests/__init__.py` only. We use 2.10.1 with Flink.
 
+### Hive
+
+Current Hive version that is being used `2.3.9` which supports Hadoop version of `2.10.1`. To update the version, it needs to be only updated 
+in `notebooks/tests/__init__.py`.
+
 ## Binder
 
 [Binder](https://mybinder.org) is a more customizable platform for Jupyter notebooks and
