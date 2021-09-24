@@ -43,7 +43,7 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
     with start_nessie() as _:
         with start_hive() as h:
             # We give hive few seconds to start
-            time.sleep(15)
+            time.sleep(60)
             with testbook(path_to_notebook, timeout=360) as tb:
                 tb.execute()
                 yield tb
