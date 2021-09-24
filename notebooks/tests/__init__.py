@@ -49,9 +49,10 @@ _ICEBERG_FLINK_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg
 _ICEBERG_HIVE_FILENAME = f"iceberg-hive-runtime-{_ICEBERG_VERSION}.jar"
 _ICEBERG_HIVE_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-hive-runtime/{_ICEBERG_VERSION}/{_ICEBERG_HIVE_FILENAME}"
 
-_HIVE_VERSION  =  "2.3.9"
+_HIVE_VERSION = "2.3.9"
 _HIVE_FILENAME = f"apache-hive-{_HIVE_VERSION}-bin"
 _HIVE_URL = f"https://apache.mirror.digionline.de/hive/hive-{_HIVE_VERSION}/{_HIVE_FILENAME}.tar.gz"
+
 
 def _find_notebook(notebook_file: str) -> str:
     path_to_notebook = os.path.join("notebooks", notebook_file)
@@ -156,7 +157,7 @@ def fetch_iceberg_flink() -> str:
 def fetch_hive() -> None:
     """Download and unzip Hive."""
     _get_unzip(_HIVE_FILENAME, _HIVE_URL)
-    os.environ["HIVE_HOME"] = os.path.join(os.getcwd(), _HIVE_FILENAME)    
+    os.environ["HIVE_HOME"] = os.path.join(os.getcwd(), _HIVE_FILENAME)
 
 
 def fetch_iceberg_hive() -> str:
@@ -164,11 +165,11 @@ def fetch_iceberg_hive() -> str:
     filename = _ICEBERG_HIVE_FILENAME
     url = _ICEBERG_HIVE_URL
     _get(filename, url)
-    return filename    
+    return filename
 
 
 def fetch_hive_with_iceberg_jars() -> None:
-    """Download both Hive and Iceberg Hive jars"""
+    """Download both Hive and Iceberg Hive jars."""
     fetch_hive()
     if not os.getenv("HIVE_HOME"):
         raise Exception(
@@ -178,7 +179,6 @@ def fetch_hive_with_iceberg_jars() -> None:
     hive_auxlib_dir = os.path.join(os.getenv("HIVE_HOME"), "auxlib")
 
     if not os.path.exists(hive_auxlib_dir):
-        print(f"Folder {hive_auxlib_dir} doesn't exist, creating a new one.")
         os.mkdir(hive_auxlib_dir)
 
     iceberg_hive_jar = fetch_iceberg_hive()
@@ -188,6 +188,10 @@ def fetch_hive_with_iceberg_jars() -> None:
     except FileExistsError:
         print(f"Jar {iceberg_hive_jar} exists already.")
 
+
+def fetch_hadoop() -> None:
+    """Download Hadoop jars."""
+    _get_hadoop()
 
 
 @contextmanager
@@ -201,23 +205,3 @@ def start_nessie() -> subprocess.Popen:
         yield p
     finally:
         p.kill()
-
-
-@contextmanager
-def start_hive() -> subprocess.Popen:
-    """Context for starting and stopping Hive server"""
-    fetch_hive_with_iceberg_jars()
-    _get_hadoop()
-    try:
-        _make_script_executable("../binder/start.hive")
-        p = subprocess.Popen(
-            ["../binder/start.hive", os.getcwd(), "../binder/resources", _HIVE_VERSION], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
-        yield p
-    finally:
-        p.kill() 
-
-
-def _make_script_executable(filename: str) -> None:
-    st = os.stat(filename)
-    os.chmod(filename, st.st_mode | stat.S_IEXEC | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)    

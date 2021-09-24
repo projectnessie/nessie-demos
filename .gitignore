@@ -26,6 +26,9 @@ notebooks/hadoop-*
 notebooks/apache-hive-*-bin
 notebooks/metastore_db
 notebooks/*.log
+notebooks/*.out
+*.jar
+
 
 # Python venv
 venv/

@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 """Tests the Nessie + Iceberg + Hive Jupyter Notebook with the NBA dataset."""
-from pathlib import Path
+import time
 from typing import Any
 from typing import Generator
 
@@ -28,11 +28,9 @@ from testbook.client import TestbookNotebookClient
 
 from . import _find_notebook
 from . import start_nessie
-from . import start_hive
-import time
 
-num_salaries_on_experiment = '59'
-num_salaries_on_main = '55'
+num_salaries_on_experiment = "59"
+num_salaries_on_main = "55"
 
 
 @pytest.fixture(scope="module")
@@ -41,12 +39,11 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
     path_to_notebook = _find_notebook("nessie-iceberg-hive-demo-nba.ipynb")
 
     with start_nessie() as _:
-        with start_hive() as h:
-            # We give hive few seconds to start
-            time.sleep(60)
-            with testbook(path_to_notebook, timeout=360) as tb:
-                tb.execute()
-                yield tb
+        # We give sometime for Hive to start
+        time.sleep(20)
+        with testbook(path_to_notebook, timeout=360) as tb:
+            tb.execute()
+            yield tb
 
 
 def _assert_that_notebook(
