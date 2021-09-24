@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Install sysem dependencies
+      - name: Install system dependencies
         run: sudo apt-get install libsasl2-dev libsasl2-modules
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
