@@ -20,5 +20,3 @@ openjdk-11-jdk-headless
 # SASL lib needed for thrift API to access Hive
 libsasl2-dev
 libsasl2-modules
-python-dev
-gcc
