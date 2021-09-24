@@ -196,8 +196,7 @@ def start_nessie() -> subprocess.Popen:
     runner = fetch_nessie()
     try:
         p = subprocess.Popen(  # noqa: S603
-            #["./" + runner], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-            ["ls"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            ["./" + runner], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         yield p
     finally:
