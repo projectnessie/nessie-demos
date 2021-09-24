@@ -172,7 +172,7 @@ def fetch_hive_with_iceberg_jars() -> None:
     fetch_hive()
     if not os.getenv("HIVE_HOME"):
         raise Exception(
-            "The HIVE_HOME env var must be set and point to a valid HiveHadoop installation"
+            "The HIVE_HOME env var must be set and point to a valid Hive installation"
         )
 
     hive_auxlib_dir = os.path.join(os.getenv("HIVE_HOME"), "auxlib")
@@ -202,3 +202,23 @@ def start_nessie() -> subprocess.Popen:
         yield p
     finally:
         p.kill()
+
+
+@contextmanager
+def start_hive() -> subprocess.Popen:
+    """Context for starting and stopping Hive server"""
+    fetch_hive_with_iceberg_jars()
+    _get_hadoop()
+    try:
+        _make_script_executable("../binder/start.hive")
+        p = subprocess.Popen(
+            ["../binder/start.hive", os.getcwd(), "../binder/resources", _HIVE_VERSION], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
+        yield p
+    finally:
+        p.kill() 
+
+
+def _make_script_executable(filename: str) -> None:
+    st = os.stat(filename)
+    os.chmod(filename, st.st_mode | stat.S_IEXEC | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)    

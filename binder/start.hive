@@ -1,23 +1,40 @@
 #!/bin/bash
 
-HIVE_FOLDER_NAME=`python -c "import notebooks.tests;print(notebooks.tests._HIVE_FILENAME)"`
-HIVE_WAREHOUSE_DIR=$PWD/hive_warehouse
+HIVE_PARENT_DIR=$1
+RESOURCE_DIR=$2
+HIVE_VERSION=$3
+HIVE_FOLDER_NAME="apache-hive-$HIVE_VERSION-bin"
+HIVE_WAREHOUSE_DIR=$HIVE_PARENT_DIR/hive_warehouse
 
-export HIVE_HOME=$PWD/$HIVE_FOLDER_NAME
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+if [ -z "$HIVE_PARENT_DIR" ]; then
+  echo "Input the parent dir as the first argument"
+  exit 1
+fi 
+
+if [ -z "$RESOURCE_DIR" ]; then
+  echo "Input the resource dir as the second argument"
+  exit 1
+fi
+
+if [ -z "$HIVE_VERSION" ]; then
+  echo "Input Hive version as the third argument"
+  exit 1
+fi
+
+export HIVE_HOME=$HIVE_PARENT_DIR/$HIVE_FOLDER_NAME
 
 # Create hive warehouse folder
 mkdir $HIVE_WAREHOUSE_DIR
 
 # Copy the needed configs to Hive folder
-cp $PWD/binder/resources/hive/config/${HIVE_VERSION}/hive-site.xml ${HIVE_HOME}/conf/
+cp $RESOURCE_DIR/hive/config/hive-site.xml ${HIVE_HOME}/conf/
 
 # Set Hive warehouse path in the hive-site.xml
-sed -i "s~HIVE_WAREHOUSE_DIR~$HIVE_WAREHOUSE_DIR~g" ${HIVE_HOME}/conf/hive-site.xml
+sed -i.bak "s~HIVE_WAREHOUSE_DIR~$HIVE_WAREHOUSE_DIR~g" ${HIVE_HOME}/conf/hive-site.xml
 
 # Initialize Hive's Derby database
-nohup $HIVE_HOME/bin/schematool -dbType derby -initSchema
+$HIVE_HOME/bin/schematool -dbType derby -initSchema
 echo "Finished initializing Derby database for Hive."
 
 # Once we are done from initializing the database, we start Hive
-nohup $HIVE_HOME/bin/hive --service hiveserver2 --hiveconf hive.server2.thrift.port=10000 &
+$HIVE_HOME/bin/hive --service hiveserver2 --hiveconf hive.server2.thrift.port=10000 &

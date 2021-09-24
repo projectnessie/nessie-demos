@@ -4,12 +4,15 @@ nohup ./nessie-quarkus-runner &
 
 SPARK_VERSION=`python -c "import notebooks.tests;print(notebooks.tests._SPARK_VERSION)"`
 HADOOP_VERSION=`python -c "import notebooks.tests;print(notebooks.tests._HADOOP_VERSION)"`
+HIVE_VERSION=`python -c "import notebooks.tests;print(notebooks.tests._HIVE_VERSION)"`
+
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 
 export SPARK_HOME=$PWD/spark-$SPARK_VERSION-bin-hadoop3.2
 export HADOOP_HOME=$PWD/hadoop-$HADOOP_VERSION
 
 #Start Hive
 chmod +x $PWD/binder/start.hive
-$PWD/binder/start.hive
+nohup $PWD/binder/start.hive $PWD $PWD/binder/resources $HIVE_VERSION
 
 exec "$@"
