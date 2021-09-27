@@ -36,5 +36,8 @@ sed -i.bak "s~HIVE_WAREHOUSE_DIR~$HIVE_WAREHOUSE_DIR~g" ${HIVE_HOME}/conf/hive-s
 $HIVE_HOME/bin/schematool -dbType derby -initSchema
 echo "Finished initializing Derby database for Hive."
 
+# increase the Heap memory being used by Hive-MapReduce jobs
+export HADOOP_HEAPSIZE=1500
+
 # Once we are done from initializing the database, we start Hive
 $HIVE_HOME/bin/hive --service hiveserver2 --hiveconf hive.server2.thrift.port=10000 &
