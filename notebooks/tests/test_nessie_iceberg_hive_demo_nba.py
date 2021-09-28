@@ -71,11 +71,11 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
 
     assertion_counted(
         "current_ref.execute('SELECT COUNT(*) FROM nba.salaries')", 2
-    ).is_equal_to(num_salaries_on_experiment)
+    ).contains(num_salaries_on_experiment)
 
     assertion_counted(
         "current_ref.execute('SELECT COUNT(*) FROM nba.salaries')", 3
-    ).is_equal_to(num_salaries_on_main)
+    ).contains(num_salaries_on_main)
 
 
 def test_dependency_setup(notebook: TestbookNotebookClient) -> None:
