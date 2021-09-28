@@ -19,3 +19,5 @@ python -c "import notebooks.tests;notebooks.tests.fetch_nessie()"
 python -c "import notebooks.tests;notebooks.tests.fetch_spark()"
 
 python -c "import notebooks.tests;notebooks.tests.fetch_iceberg_flink()"
+
+python -c "import notebooks.tests;notebooks.tests.fetch_hive_with_iceberg_jars()"

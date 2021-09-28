@@ -18,13 +18,16 @@
 nessie-runner-output.log
 _assets/
 .ipynb_checkpoints/
-notebooks/spark_warehouse/
-notebooks/spark-warehouse/
+notebooks/*warehouse/
 notebooks/spark-*-bin-*
 nessie-quarkus-runner
-notebooks/iceberg-flink-runtime-*
+notebooks/iceberg-*-runtime-*
 notebooks/hadoop-*
-notebooks/flink-warehouse
+notebooks/apache-hive-*-bin
+notebooks/metastore_db
+notebooks/*.log
+notebooks/*.out
+*.jar
 
 
 # Python venv
@@ -42,3 +45,4 @@ __pycache__/
 # Misc
 *.DS_STORE/
 .DS_STORE/
+.DS_Store

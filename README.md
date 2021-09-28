@@ -5,6 +5,7 @@ These demos run under binder and can be found at:
 * [Spark and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-demo-nba.ipynb)
 * [Spark and Delta](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-delta-demo-nba.ipynb)
 * [Flink and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-flink-demo-nba.ipynb)
+* [Hive and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-hive-demo-nba.ipynb)
 
 The are automatically rebuilt every time we push to main. They are unit tested using `testbook` library to ensure we get
 the correct results as the underlying libraries continue to grow/mature.
@@ -41,6 +42,11 @@ only 1.12.1
 ### Hadoop
 
 Hadoop libs are used by flink and currently specified in `notebooks/tests/__init__.py` only. We use 2.10.1 with Flink.
+
+### Hive
+
+Current Hive version that is being used `2.3.9` which supports Hadoop version of `2.10.1`. To update the version, it needs to be only updated 
+in `notebooks/tests/__init__.py`.
 
 ## Binder
 
