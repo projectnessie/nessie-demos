@@ -25,10 +25,10 @@ from _pytest.tmpdir import TempPathFactory
 from assertpy import assert_that
 from testbook import testbook
 from testbook.client import TestbookNotebookClient
+from utils import _copy_all_hadoop_jars_to_pyflink
+from utils import fetch_iceberg_flink
 
-from . import _copy_all_hadoop_jars_to_pyflink
 from . import _find_notebook
-from . import fetch_iceberg_flink
 from . import start_nessie
 
 num_salaries_on_experiment = """EXPR$0

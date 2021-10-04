@@ -11,13 +11,13 @@ conda create -n flink-demo pandas ipykernel requests python=="$PYTHON_VERSION"
 conda activate flink-demo
 pip install apache-flink=="$FLINK_VERSION" pynessie=="$NESSIE_VERSION"
 python -m ipykernel install --name "flink-demo" --user
-python -c "import notebooks.tests;notebooks.tests._copy_all_hadoop_jars_to_pyflink()"
+python -c "import utils;utils._copy_all_hadoop_jars_to_pyflink()"
 conda deactivate
 
-python -c "import notebooks.tests;notebooks.tests.fetch_nessie()"
+python -c "import utils;utils.fetch_nessie()"
 
-python -c "import notebooks.tests;notebooks.tests.fetch_spark()"
+python -c "import utils;utils.fetch_spark()"
 
-python -c "import notebooks.tests;notebooks.tests.fetch_iceberg_flink()"
+python -c "import utils;utils.fetch_iceberg_flink()"
 
-python -c "import notebooks.tests;notebooks.tests.fetch_hive_with_iceberg_jars()"
+python -c "import utils;utils.fetch_hive_with_iceberg_jars()"

@@ -24,9 +24,9 @@ from _pytest.tmpdir import TempPathFactory
 from assertpy import assert_that
 from testbook import testbook
 from testbook.client import TestbookNotebookClient
+from utils import fetch_spark
 
 from . import _find_notebook
-from . import fetch_spark
 from . import start_nessie
 
 num_salaries_on_experiment = """count(1)
