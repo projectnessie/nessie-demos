@@ -36,6 +36,7 @@ repos:
     - id: check-json
     - id: debug-statements
     - id: detect-aws-credentials
+      args: [--allow-missing-credentials]
     - id: detect-private-key
     - id: fix-encoding-pragma
     - id: requirements-txt-fixer
@@ -46,3 +47,9 @@ repos:
     rev: 0.4.0
     hooks:
     - id: nbstripout
+-   repo: local
+    hooks:
+    - id: modify-dockerfile
+      name: Generate Docker Tag and Modify Dockerfile
+      language: script
+      entry: .github/scripts/modify_dockerfile.sh
