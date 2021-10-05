@@ -1,5 +1,5 @@
 # We use the pre-existing Nessie Demos Docker image that through CI
-FROM omarsmak/nessie-demos-base-image:latest
+FROM omarsmak/nessie-demos-base-image:1
 
 # Create the necessary folders for the demo, this will be created and ownded by {NB_USER}
 RUN mkdir -p notebooks && mkdir -p datasets
