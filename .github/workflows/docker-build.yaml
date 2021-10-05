@@ -15,6 +15,7 @@
 #
 
 name: Building Binder Docker Image
+
 on:
   pull_request:
     types: [opened, reopened, converted_to_draft]
@@ -30,20 +31,20 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install jupyter-repo2docker
-      - name: Build and push docker image
-        run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh" 
-          "${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh 'omarsmak/nessie-demos-base-image' 'docker'"         
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install jupyter-repo2docker
+    - name: Build and push docker image
+      run: |
+        chmod +x "${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh" 
+        ${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh "omarsmak/nessie-demos-base-image" "docker"         

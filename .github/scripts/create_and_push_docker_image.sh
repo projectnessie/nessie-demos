@@ -47,4 +47,4 @@ git config --global user.email "github-actions[bot]@users.noreply.github.com"
 git config --global user.name "github-actions[bot]"
 git add ${INPUT_BINDER_DOCKER_FILE}
 git commit -m "Update image tag"
-git push -f
+git push
