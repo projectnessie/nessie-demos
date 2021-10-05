@@ -1,5 +1,8 @@
-# We use the pre-existing Nessie Demos Docker image that through CI
+# Base image to use for demos. DO NOT MANUALLY MODIFY!
+
+##START_BASE_IMAGE##
 FROM omarsmak/nessie-demos-base-image:1
+##END_BASE_IMAGE##
 
 # Create the necessary folders for the demo, this will be created and ownded by {NB_USER}
 RUN mkdir -p notebooks && mkdir -p datasets
