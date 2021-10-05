@@ -43,8 +43,8 @@ DOCKER_FROM_STATEMENT="FROM ${DOCKER_FULL_IMAGE_NAME}"
 sed -i "/${START_TEMPLATE}/,/${END_TEMPLATE}/c\\${START_TEMPLATE}\n${DOCKER_FROM_STATEMENT}\n${END_TEMPLATE}" ${INPUT_BINDER_DOCKER_FILE}
 
 # Commit the updated Dockerfile
-git config --global user.email "github-actions[bot]@users.noreply.github.com"
-git config --global user.name "github-actions[bot]"
-git add ${INPUT_BINDER_DOCKER_FILE}
-git commit -m "Update image tag"
-git push
+#git config --global user.email "github-actions[bot]@users.noreply.github.com"
+#git config --global user.name "github-actions[bot]"
+#git add ${INPUT_BINDER_DOCKER_FILE}
+#git commit -m "Update image tag"
+#git push
