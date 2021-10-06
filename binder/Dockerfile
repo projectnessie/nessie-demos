@@ -1,7 +1,7 @@
 # Base image to use for demos. DO NOT MANUALLY MODIFY!
 
 ##START_BASE_IMAGE##
-FROM omarsmak/nessie-demos-base-image:39d606eaec53
+FROM omarsmak/nessie-demos-base-image:65118fe74aa9
 ##END_BASE_IMAGE##
 
 # Create the necessary folders for the demo, this will be created and ownded by {NB_USER}
