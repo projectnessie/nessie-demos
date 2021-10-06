@@ -3,7 +3,6 @@
 INPUT_IMAGE_NAME=$1
 INPUT_REPO_DIR=$2
 INPUT_NOTEBOOK_USER=$3
-INPUT_BINDER_DOCKER_FILE="binder/Dockerfile"
 
 # Check for docker image name
 if [ -z "$INPUT_IMAGE_NAME" ]; then
@@ -34,19 +33,7 @@ SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-12)
 DOCKER_FULL_IMAGE_NAME="${INPUT_IMAGE_NAME}:${SHORT_SHA}"
 
 # Build and push docker image
-#jupyter-repo2docker --image-name ${DOCKER_FULL_IMAGE_NAME} --no-run --push --user-id 1000 --user-name ${NB_USER} ${INPUT_REPO_DIR}
+jupyter-repo2docker --image-name ${DOCKER_FULL_IMAGE_NAME} --no-run --push --user-id 1000 --user-name ${NB_USER} ${INPUT_REPO_DIR}
 
-# Update dockerfile
-START_TEMPLATE="##START_BASE_IMAGE##"
-END_TEMPLATE="##END_BASE_IMAGE##"
-DOCKER_FROM_STATEMENT="FROM ${DOCKER_FULL_IMAGE_NAME}"
-sed -i "/${START_TEMPLATE}/,/${END_TEMPLATE}/c\\${START_TEMPLATE}\n${DOCKER_FROM_STATEMENT}\n${END_TEMPLATE}" ${INPUT_BINDER_DOCKER_FILE}
-
-cat ${INPUT_BINDER_DOCKER_FILE}
-
-# Commit the updated Dockerfile
-git config user.email "github-actions[bot]@users.noreply.github.com"
-git config user.name "github-actions[bot]"
-git add ${INPUT_BINDER_DOCKER_FILE}
-git commit -m "Update image tag"
-git push
+# Set the output docker tag we have from here
+echo "::set-output name=image_tag::${SHORT_SHA}"
