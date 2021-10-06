@@ -17,6 +17,8 @@
 name: Building Binder Docker Image
 
 on:
+  push:
+    branches: [docker-speed]
   pull_request:
     types: [opened, reopened, converted_to_draft]
 
