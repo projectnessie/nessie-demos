@@ -62,7 +62,7 @@ jobs:
       id: docker_build
       run: |
         chmod +x "${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh" 
-        ${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh "${{ env.IMAGE_NAME }}" "{{ env.DOCKER_FOLDER }}"
+        ${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh "${{ env.IMAGE_NAME }}" "${{ env.DOCKER_FOLDER }}"
     - name: Modify and commit Binder Dockerfile
       run: |
         chmod +x "${GITHUB_WORKSPACE}/.github/scripts/modify_and_commit_dockerfile.sh" 
