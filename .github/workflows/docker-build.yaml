@@ -20,7 +20,7 @@ on:
   push:
     branches: [docker-speed]
   pull_request:
-    types: [opened, reopened]
+    types: [opened, synchronize, reopened]
     paths:
       # We do only build the docker image if the content of folder docker has changed
       - 'docker/**'
@@ -67,3 +67,7 @@ jobs:
       run: |
         chmod +x "${GITHUB_WORKSPACE}/.github/scripts/modify_and_commit_dockerfile.sh" 
         ${GITHUB_WORKSPACE}/.github/scripts/modify_and_commit_dockerfile.sh "${{ env.IMAGE_NAME }}" "${{ steps.docker_build.outputs.image_tag }}" "${{ env.BINDER_DOCKERFILE }}"
+    - name: Trigger MyBinder build to cache the new image
+      run: |
+        chmod +x "${GITHUB_WORKSPACE}/.github/scripts/trigger_binder.sh" 
+        ${GITHUB_WORKSPACE}/.github/scripts/trigger_binder.sh "https://gke.mybinder.org/build/gh/$GITHUB_REPOSITORY/${GITHUB_REF#refs/heads/}"
