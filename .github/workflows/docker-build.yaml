@@ -17,8 +17,6 @@
 name: Building Binder Docker Image
 
 on:
-  push:
-    branches: [docker-speed]
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
