@@ -20,7 +20,7 @@ build==0.7.0
 flake8==4.0.1
 ipython
 jupyterlab==3.1.18
-pip==21.2.4
+pip==21.3
 pytest==6.2.5
 pytest-mock==3.6.1
 pytest-mypy==0.8.1
