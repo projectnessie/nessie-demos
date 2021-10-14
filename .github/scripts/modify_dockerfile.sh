@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (C) 2020 Dremio
 #
@@ -14,36 +15,17 @@
 # limitations under the License.
 #
 
-# Nessie Demos artifacts
-nessie-runner-output.log
-_assets/
-.ipynb_checkpoints/
-notebooks/*warehouse/
-notebooks/spark-*-bin-*
-nessie-quarkus-runner
-notebooks/iceberg-*-runtime-*
-notebooks/hadoop-*
-notebooks/apache-hive-*-bin
-notebooks/metastore_db
-notebooks/*.log
-notebooks/*.out
-*.jar
+# Install checksumdir to generate a reliable sha1 for Docker tags that
+# can detect the changes in content in a folder
+pip install checksumdir
 
+CONTENT_FOLDER="docker/"
+BINDER_DOCKERFILE="binder/Dockerfile"
 
-# Python venv
-venv/
-.tox/
-__pycache__/
-.pytest_cache
+# Generate the sha1 for the content of the folder
+DOCKER_TAG="$(checksumdir -a sha1 $CONTENT_FOLDER)"
 
-# Jetbrains IDEs
-/.idea
-*.iws
-*.ipr
-*.iml
+# Change the tag in Dockerfile
+sed -i.bak -E "s/(.*image:).*/\1$DOCKER_TAG/" $BINDER_DOCKERFILE
 
-# Misc
-*.DS_STORE/
-.DS_STORE/
-.DS_Store
-*/*.bak
+git add $BINDER_DOCKERFILE
