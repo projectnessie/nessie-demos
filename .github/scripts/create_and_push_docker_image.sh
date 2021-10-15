@@ -56,5 +56,9 @@ DOCKER_FULL_IMAGE_NAME="${INPUT_IMAGE_NAME}:${INPUT_IMAGE_TAG}"
 # Build and push docker image
 jupyter-repo2docker --image-name "${DOCKER_FULL_IMAGE_NAME}" --no-run --push --user-id 1000 --user-name "${NB_USER}" ${INPUT_REPO_DIR}
 
+# Tag our image with "latest" in case we need to use it in other cases like running unit tests
+docker tag "${DOCKER_FULL_IMAGE_NAME}" "${INPUT_IMAGE_NAME}:latest"
+docker push "${INPUT_IMAGE_NAME}:latest"
+
 # Set the output docker tag we have from here
 echo "::set-output name=image_tag::${INPUT_IMAGE_TAG}"
