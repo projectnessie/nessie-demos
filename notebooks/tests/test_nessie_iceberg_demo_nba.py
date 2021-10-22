@@ -27,6 +27,7 @@ from testbook.client import TestbookNotebookClient
 from utils import fetch_spark
 
 from . import _find_notebook
+from . import _remove_folders
 from . import start_nessie
 
 num_salaries_on_experiment = """count(1)
@@ -46,6 +47,8 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
         with testbook(path_to_notebook, timeout=300) as tb:
             tb.execute()
             yield tb
+            # Clean all the folders that being created by this test
+            _remove_folders(["spark-warehouse", "spark_warehouse"])
 
 
 def _assert_that_notebook(

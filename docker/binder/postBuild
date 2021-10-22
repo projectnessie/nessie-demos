@@ -15,16 +15,13 @@
 # limitations under the License.
 #
 
-FLINK_VERSION=1.12.1
-
-NESSIE_VERSION=`python -c "import pynessie;print(pynessie.__version__)"`
 PYTHON_VERSION=`python --version|awk '{print $2}'`
 
 python --version
 source /srv/conda/etc/profile.d/conda.sh
 conda create -n flink-demo pandas ipykernel requests python=="$PYTHON_VERSION"
 conda activate flink-demo
-pip install apache-flink=="$FLINK_VERSION" pynessie=="$NESSIE_VERSION"
+pip install -r "binder/requirements_flink.txt"
 python -m ipykernel install --name "flink-demo" --user
 python -c "import utils;utils._copy_all_hadoop_jars_to_pyflink()"
 conda deactivate

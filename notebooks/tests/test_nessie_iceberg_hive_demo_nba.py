@@ -27,6 +27,7 @@ from testbook import testbook
 from testbook.client import TestbookNotebookClient
 
 from . import _find_notebook
+from . import _remove_folders
 from . import start_nessie
 
 num_salaries_on_experiment = "59"
@@ -44,6 +45,8 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
         with testbook(path_to_notebook, timeout=360) as tb:
             tb.execute()
             yield tb
+            # Clean all the folders that being created by this test
+            _remove_folders(["nessie_warehouse", "hive_warehouse", "metastore_db"])
 
 
 def _assert_that_notebook(

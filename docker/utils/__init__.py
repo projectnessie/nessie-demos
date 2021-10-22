@@ -49,7 +49,9 @@ _ICEBERG_HIVE_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-
 
 _HIVE_VERSION = "2.3.9"
 _HIVE_FILENAME = f"apache-hive-{_HIVE_VERSION}-bin"
-_HIVE_URL = f"https://apache.mirror.digionline.de/hive/hive-{_HIVE_VERSION}/{_HIVE_FILENAME}.tar.gz"
+_HIVE_URL = (
+    f"https://archive.apache.org/dist/hive/hive-{_HIVE_VERSION}/{_HIVE_FILENAME}.tar.gz"
+)
 
 
 def _get_unzip(filename: str, url: str) -> None:
@@ -120,15 +122,30 @@ def _get(filename: str, url: str) -> None:
 def fetch_nessie() -> str:
     """Download nessie executable."""
     runner = "nessie-quarkus-runner"
-    import pynessie
 
-    version = pynessie.__version__
-    url = "https://github.com/projectnessie/nessie/releases/download/nessie-{}/nessie-quarkus-{}-runner".format(
-        version, version
-    )
+    url = _get_base_nessie_url()
     _get(runner, url)
     os.chmod(runner, os.stat(runner).st_mode | stat.S_IXUSR)
     return runner
+
+
+def fetch_nessie_jar() -> str:
+    """Download nessie Jar in order to run the tests in Mac"""
+    runner = "nessie-quarkus-runner.jar"
+
+    url = _get_base_nessie_url() + ".jar"
+    _get(runner, url)
+    return runner
+
+
+def _get_base_nessie_url() -> str:
+    import pynessie
+
+    version = pynessie.__version__
+
+    return "https://github.com/projectnessie/nessie/releases/download/nessie-{}/nessie-quarkus-{}-runner".format(
+        version, version
+    )
 
 
 def fetch_iceberg_flink() -> str:
