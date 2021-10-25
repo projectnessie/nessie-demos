@@ -29,6 +29,7 @@ from utils import _copy_all_hadoop_jars_to_pyflink
 from utils import fetch_iceberg_flink
 
 from . import _find_notebook
+from . import _remove_folders
 from . import start_nessie
 
 num_salaries_on_experiment = """EXPR$0
@@ -52,6 +53,8 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
         with testbook(path_to_notebook, timeout=360) as tb:
             tb.execute()
             yield tb
+            # Clean all the folders that being created by this test
+            _remove_folders(["flink-warehouse"])
 
 
 def _assert_that_notebook(

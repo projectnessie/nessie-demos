@@ -18,8 +18,7 @@ Some versions have to be updated in multiple places:
 
 ### Nessie
 
-Nessie version is set in Binder at `docker/binder/requirements.txt` and for unit tests in `notebooks/tox.ini`. Currently, Iceberg and Delta
-both support only 0.9.x of Nessie.
+Nessie version is set in Binder at `docker/binder/requirements_base.txt`. Currently, Iceberg and Delta both support only 0.9.x of Nessie.
 
 ### Iceberg
 
@@ -27,7 +26,7 @@ Currently we are using Iceberg `0.12.0` and it is specified in both iceberg note
 
 ### Delta
 
-currently Delta version is taken directly from the Nessie version and isn't explicitly noted. It is currently `1.0.0-nessie`
+Currently Delta version is taken directly from the Nessie version and isn't explicitly noted. It is currently `1.0.0-nessie`
 
 ### Spark
 
@@ -36,12 +35,11 @@ Only has to be updated in `docker/binder/requirements.txt`. Currently Iceberg su
 
 ### Flink
 
-Flink version is set in Binder at `docker/binder/postBuild` and for unit tests in `notebooks/tox.ini`. Currently, Iceberg supports
-only 1.12.1
+Flink version is set in Binder at `docker/binder/requirements_flink.txt`. Currently, Iceberg supports only `1.12.1`.
 
 ### Hadoop
 
-Hadoop libs are used by flink and currently specified in `docker/utils/__init__.py` only. We use 2.10.1 with Flink.
+Hadoop libs are used by flink and currently specified in `docker/utils/__init__.py` only. We use `2.10.1` with Flink and Hive.
 
 ### Hive
 
@@ -65,3 +63,10 @@ For development, you will need to make sure to have the following installed:
 
 Regarding pre-commit, you will need to make sure is installed through `pre-commit install` in order to install the hooks locally since this repo
 executes some several scripts in pre-commit stage.
+
+To run the notebooks unit tests, in `notebook` folder, run the following commands:
+1. `pip install -r requirements_dev.txt`
+2. `tox`
+
+Running the unit tests takes time since it will need to download all the binaries files like Hive, Flink ..etc and then it will
+run the tests.

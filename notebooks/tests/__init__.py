@@ -17,10 +17,13 @@
 #
 """Unit tests for demo notebooks."""
 import os
+import platform
+import shutil
 import subprocess  # noqa: S404
 from contextlib import contextmanager
 
 from utils import fetch_nessie
+from utils import fetch_nessie_jar
 
 
 def _find_notebook(notebook_file: str) -> str:
@@ -36,14 +39,36 @@ def _find_notebook(notebook_file: str) -> str:
     return os.path.abspath(path_to_notebook)
 
 
+def _remove_folders(input_folders: [str]) -> None:
+    for folder in input_folders:
+        path_to_folder = os.path.join(os.path.abspath("."), folder)
+        if os.path.exists(path_to_folder):
+            shutil.rmtree(path_to_folder)
+        else:
+            # We ignore the error if a folder doesn't exist in order not to break any tests
+            print(f"Could not find {path_to_folder} in {os.path.abspath('.')}")
+
+
 @contextmanager
 def start_nessie() -> subprocess.Popen:
     """Context for starting and stopping a nessie binary."""
-    runner = fetch_nessie()
+    start_command = _fetch_and_get_nessie_start_command()
     try:
         p = subprocess.Popen(  # noqa: S603
-            ["./" + runner], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            start_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         yield p
     finally:
         p.kill()
+
+
+def _fetch_and_get_nessie_start_command() -> [str]:
+    operating_system = platform.system().lower()
+
+    if operating_system == "darwin":
+        # In Mac case, we use the nessie jar
+        runner = fetch_nessie_jar()
+        return ["java", "-jar", runner]
+    else:
+        runner = fetch_nessie()
+        return ["./" + runner]
