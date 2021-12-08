@@ -53,13 +53,15 @@ def _remove_folders(input_folders: [str]) -> None:
 def start_nessie() -> subprocess.Popen:
     """Context for starting and stopping a nessie binary."""
     start_command = _fetch_and_get_nessie_start_command()
+    p = None
     try:
         p = subprocess.Popen(  # noqa: S603
             start_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
         yield p
     finally:
-        p.kill()
+        if p:
+            p.kill()
 
 
 def _fetch_and_get_nessie_start_command() -> [str]:
