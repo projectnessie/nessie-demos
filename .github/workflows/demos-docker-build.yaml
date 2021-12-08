@@ -20,8 +20,8 @@ on:
   push:
     branches: [ main ]
     paths:
-      # We do only build the docker image if the content of folder docker has changed
-      - 'docker/**'
+      # We do only build the docker image if the content of binder Dockerfile has changed
+      - 'binder/Dockerfile'
 
 jobs:
   trigger-binder-docker-build:
