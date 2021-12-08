@@ -23,7 +23,7 @@ CONTENT_FOLDER="docker/"
 BINDER_DOCKERFILE="binder/Dockerfile"
 
 # Generate the sha1 for the content of the folder
-DOCKER_TAG="$(checksumdir -a sha1 $CONTENT_FOLDER)"
+DOCKER_TAG="$(checksumdir -i -e '__pycache__' -a sha1 $CONTENT_FOLDER)"
 
 # Change the tag in Dockerfile
 sed -i.bak -E "s/(FROM.*:).*/\1$DOCKER_TAG/" $BINDER_DOCKERFILE
