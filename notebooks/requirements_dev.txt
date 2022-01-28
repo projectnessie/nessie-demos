@@ -22,7 +22,7 @@ ipython
 jupyterlab==3.2.8
 pip==21.3.1
 pytest==6.2.5
-pytest-mock==3.6.1
+pytest-mock==3.7.0
 pytest-mypy==0.8.1
 pytest-runner==5.3.1
 Sphinx==4.3.2
