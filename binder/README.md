@@ -1,7 +1,7 @@
 ## Building binder locally
 
 ### Prerequisites
-You need to have a python3 installed. 
+You need to have a python 3.7+ installed. 
 We recommend to use [pyenv](https://github.com/pyenv/pyenv) for managing your python environment(s). 
 
 To build the binder image locally, firstly, you need to install `jupyter-repo2docker` dependency:
