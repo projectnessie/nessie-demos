@@ -24,7 +24,7 @@ pip==22.0.3
 pytest==7.0.1
 pytest-mock==3.7.0
 pytest-mypy==0.9.1
-pytest-runner==5.3.1
+pytest-runner==6.0.0
 Sphinx==4.4.0
 sphinx-autodoc-typehints==1.17.0
 testbook[dev]==0.4.2
