@@ -27,3 +27,4 @@ jobs:
       - uses: s-weigand/trigger-mybinder-build@v1
         with:
           target-repo: projectnessie/nessie-demos
+          target-state: main
