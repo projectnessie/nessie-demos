@@ -17,7 +17,7 @@
 
 # Install checksumdir to generate a reliable sha1 for Docker tags that
 # can detect the changes in content in a folder
-pip install checksumdir
+python -m pip install checksumdir
 
 CONTENT_FOLDER="docker/"
 BINDER_DOCKERFILE="binder/Dockerfile"

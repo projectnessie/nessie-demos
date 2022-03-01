@@ -65,7 +65,7 @@ Regarding pre-commit, you will need to make sure is installed through `pre-commi
 executes some several scripts in pre-commit stage.
 
 To run the notebooks unit tests, in `notebook` folder, run the following commands:
-1. `pip install -r requirements_dev.txt`
+1. `python -m pip install -r requirements_dev.txt`
 2. `tox`
 
 Running the unit tests takes time since it will need to download all the binaries files like Hive, Flink ..etc and then it will
