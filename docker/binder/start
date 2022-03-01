@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Copyright (C) 2020 Dremio
 #
@@ -17,9 +17,9 @@
 
 nohup ./nessie-quarkus-runner &
 
-SPARK_VERSION=`python -c "import utils;print(utils._SPARK_VERSION)"`
-HADOOP_VERSION=`python -c "import utils;print(utils._HADOOP_VERSION)"`
-HIVE_VERSION=`python -c "import utils;print(utils._HIVE_VERSION)"`
+SPARK_VERSION=$(python -c "import utils;print(utils._SPARK_VERSION)")
+HADOOP_VERSION=$(python -c "import utils;print(utils._HADOOP_VERSION)")
+HIVE_VERSION=$(python -c "import utils;print(utils._HIVE_VERSION)")
 
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 

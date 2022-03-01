@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/bin/bash -e
 
 python -c "import utils;utils.fetch_hadoop()"
 
 python -c "import utils;utils.fetch_hive_with_iceberg_jars()"
 
-HADOOP_VERSION=`python -c "import utils;print(utils._HADOOP_VERSION)"`
+HADOOP_VERSION=$(python -c "import utils;print(utils._HADOOP_VERSION)")
 
-HIVE_VERSION=`python -c "import utils;print(utils._HIVE_VERSION)"`
+HIVE_VERSION=$(python -c "import utils;print(utils._HIVE_VERSION)")
 
 export HADOOP_HOME=$PWD/hadoop-$HADOOP_VERSION
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # Copyright (C) 2020 Dremio
 #
@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-PYTHON_VERSION=`python --version|awk '{print $2}'`
+PYTHON_VERSION=$(python --version | awk '{print $2}')
 
 python --version
 source /srv/conda/etc/profile.d/conda.sh
