@@ -8,7 +8,7 @@ To build the binder image locally, firstly, you need to install `jupyter-repo2do
 
 ```shell
 python -m pip install --upgrade pip
-pip install jupyter-repo2docker
+python -m pip install jupyter-repo2docker
 ```
 
 ### Building the image
