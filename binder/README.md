@@ -17,8 +17,13 @@ Once you have all dependencies, run:
 ```shell
 jupyter-repo2docker .
 ```
-It will start the local binder instance and expose it via a docker port. 
-Make sure to run it in the root directory of this project (not in the `binder` director). 
+It will start the local binder instance and expose it via a docker port.
+Make sure to run it in the root directory of this project (not in the `binder` director).
+
+### Building the base image
+
+If you modify the contents of the `docker` folder, you will need to update the base image.
+Run (or look into) the `build_run_local_docker.sh` script how to do this semi-automatically.
 
 ### Connecting to a container
 After those steps, the binder should be running on your local machine.

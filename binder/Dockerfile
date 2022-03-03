@@ -2,7 +2,7 @@
 
 # Tag will be automatically generated through pre-commit hook if any changes
 # happened in the docker/ folder
-FROM ghcr.io/projectnessie/nessie-binder-demos:982fe3adb1e8b58263c74d0b3fc4b6b9ab97f652
+FROM ghcr.io/projectnessie/nessie-binder-demos:e12478cfb3447af4bc26e535a9daffe374233aa1
 
 # Create the necessary folders for the demo, this will be created and owned by {NB_USER}
 RUN mkdir -p notebooks && mkdir -p datasets

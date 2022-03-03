@@ -26,6 +26,6 @@ BINDER_DOCKERFILE="binder/Dockerfile"
 DOCKER_TAG="$(checksumdir -i -e '__pycache__' -a sha1 $CONTENT_FOLDER)"
 
 # Change the tag in Dockerfile
-sed -i.bak -E "s/(FROM.*:).*/\1$DOCKER_TAG/" $BINDER_DOCKERFILE
+sed -i -E "s/(FROM.*:).*/\1$DOCKER_TAG/" $BINDER_DOCKERFILE
 
 git add $BINDER_DOCKERFILE
