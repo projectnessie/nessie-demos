@@ -8,7 +8,7 @@ FROM ghcr.io/projectnessie/nessie-binder-demos:982fe3adb1e8b58263c74d0b3fc4b6b9a
 RUN mkdir -p notebooks && mkdir -p datasets
 
 # Copy the python notebooks into the existing notebooks folder
-COPY notebooks/ notebooks/
+COPY notebooks/*.ipynb notebooks/
 
 # Copy all the needed datasets for the demos
 COPY datasets/ datasets/

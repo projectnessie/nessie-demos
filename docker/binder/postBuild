@@ -21,7 +21,7 @@ python --version
 source /srv/conda/etc/profile.d/conda.sh
 conda create -n flink-demo pandas ipykernel requests python=="$PYTHON_VERSION"
 conda activate flink-demo
-python -m pip install -r "binder/requirements_flink.txt"
+python -m pip install --no-cache-dir -r "binder/requirements_flink.txt"
 python -m ipykernel install --name "flink-demo" --user
 python -c "import utils;utils._copy_all_hadoop_jars_to_pyflink()"
 conda deactivate
@@ -33,3 +33,7 @@ python -c "import utils;utils.fetch_spark()"
 python -c "import utils;utils.fetch_iceberg_flink()"
 
 python -c "import utils;utils.fetch_hive_with_iceberg_jars()"
+
+# clean up files that are not needed in the docker image
+rm -rf ~/.cache/pip/
+rm -rf /tmp/* || true
