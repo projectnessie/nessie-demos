@@ -34,6 +34,9 @@ python -c "import utils;utils.fetch_iceberg_flink()"
 
 python -c "import utils;utils.fetch_hive_with_iceberg_jars()"
 
+# replace duplicate files with hardlinks
+rdfind -makehardlinks true -makeresultsfile false /srv/conda/envs/*
+
 # clean up files that are not needed in the docker image
 rm -rf ~/.cache/pip/
 rm -rf /tmp/* || true
