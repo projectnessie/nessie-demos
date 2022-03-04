@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-if ! python -m pip list | grep jupyter-repo2docker; then
+if ! command -v jupyter-repo2docker >/dev/null; then
   echo "Please prepare a python environment with jupyter-repo2docker!"
   exit 1
 fi
@@ -32,8 +32,8 @@ bash -ex .github/scripts/modify_dockerfile.sh
 NEW_BASE_IMAGE_NAME=$(get_current_base_image_name)
 
 # avoid remote repository for the rest of the script
-sed -i 's#FROM ghcr.io/projectnessie#FROM projectnessie#' binder/Dockerfile
-trap "sed -i 's#FROM projectnessie#FROM ghcr.io/projectnessie#' binder/Dockerfile" EXIT
+sed -i.bak 's#FROM ghcr.io/projectnessie#FROM projectnessie#' binder/Dockerfile
+trap "sed -i.bak 's#FROM projectnessie#FROM ghcr.io/projectnessie#' binder/Dockerfile" EXIT
 
 if [ "${OLD_BASE_IMAGE_NAME}" != "${NEW_BASE_IMAGE_NAME}" ]; then
   # build base image with the new tag locally
