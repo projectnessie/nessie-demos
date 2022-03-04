@@ -35,7 +35,7 @@ if docker image inspect "${DOCKER_FULL_IMAGE_NAME}" >/dev/null 2>&1; then
 else
   # build base image with the new tag locally
   echo "base image tag has changed! - starting build..."
-  bash -ex .github/scripts/create_and_push_docker_image.sh "${DOCKER_FULL_IMAGE_NAME}" dontpush
+  bash -ex .github/scripts/create_base_docker_image.sh "${DOCKER_FULL_IMAGE_NAME}"
 fi
 
 # build and run repo

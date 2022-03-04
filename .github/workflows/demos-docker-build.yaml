@@ -62,7 +62,7 @@ jobs:
       id: docker_build
       run: |
         DOCKER_FULL_IMAGE_NAME=$(grep -i 'FROM' binder/Dockerfile | cut -f2 -d' ')
-        ${GITHUB_WORKSPACE}/.github/scripts/create_and_push_docker_image.sh "${DOCKER_FULL_IMAGE_NAME}" push
+        ${GITHUB_WORKSPACE}/.github/scripts/create_base_docker_image.sh "${DOCKER_FULL_IMAGE_NAME}" push
     - name: Trigger MyBinder build to cache the new image
       run: |
         ${GITHUB_WORKSPACE}/.github/scripts/trigger_binder.sh "https://gke.mybinder.org/build/gh/$GITHUB_REPOSITORY/${GITHUB_REF#refs/heads/}"
