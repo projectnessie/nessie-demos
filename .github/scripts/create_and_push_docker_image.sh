@@ -15,50 +15,28 @@
 # limitations under the License.
 #
 
-INPUT_IMAGE_NAME=$1
-INPUT_IMAGE_TAG=$2
-INPUT_REPO_DIR=$3
-INPUT_NOTEBOOK_USER=$4
+INPUT_DOCKER_FULL_IMAGE_NAME=$1
+INPUT_PUSH=$2
 
-# Check for docker image name
-if [ -z "$INPUT_IMAGE_NAME" ]; then
-  echo "Input the image name for the docker image as the first parameter"
-  exit 1
+# ghcr.io/projectnessie/nessie-binder-demos:e12478cfb3447af4bc26e535a9daffe374233aa1
+DOCKER_IMAGE_NAME=$(echo "${INPUT_DOCKER_FULL_IMAGE_NAME}" | cut -f1 -d":")
+DOCKER_IMAGE_TAG=$(echo "${INPUT_DOCKER_FULL_IMAGE_NAME}" | cut -f2 -d":")
+
+if [ "$INPUT_PUSH" = 'push' ]; then
+  PUSH_ARGS='--push'
+else
+  PUSH_ARGS=''
 fi
 
-# Check for docker tag
-if [ -z "$INPUT_IMAGE_TAG" ]; then
-  echo "Input the image tag for the docker image as the second parameter"
-  exit 1
+# The default username being used by mybinder.org is 'jovyan'
+# It is used by mybinder.org to build and run docker files
+# therefore it expects /home/jovyan to exist in order to run the docker image
+
+# Build the docker base image
+jupyter-repo2docker --user-id 1000 --user-name jovyan --image-name "${INPUT_DOCKER_FULL_IMAGE_NAME}" --no-run ${PUSH_ARGS} docker
+
+if [ "$INPUT_PUSH" = 'push' ]; then
+  # Tag our image with "latest" in case we need to use it in other cases like running unit tests
+  docker tag "${INPUT_DOCKER_FULL_IMAGE_NAME}" "${DOCKER_IMAGE_NAME}:latest"
+  docker push "${DOCKER_IMAGE_NAME}:latest"
 fi
-
-# Check for repo dir
-if [ -z "$INPUT_REPO_DIR" ]; then
-  echo "Input the repo dir to be used to build docker image as the third parameter"
-  exit 1
-fi
-
-# Set jupyter username
-if [ -z "$INPUT_NOTEBOOK_USER" ];
-    then
-        # The default username being used by mybinder.org is 'jovyan'
-        # It is used by mybinder.org to build and run docker files
-        # therefore it expects the /home/jovyan to be existed in order to run the docker image
-        NB_USER="jovyan"
-
-    else
-        NB_USER="${INPUT_NOTEBOOK_USER}"
-fi
-
-# Set Docker image full name
-DOCKER_FULL_IMAGE_NAME="${INPUT_IMAGE_NAME}:${INPUT_IMAGE_TAG}"
-
-# Build and push docker image
-jupyter-repo2docker --image-name "${DOCKER_FULL_IMAGE_NAME}" --no-run --push --user-id 1000 --user-name "${NB_USER}" ${INPUT_REPO_DIR}
-
-# Tag our image with "latest" in case we need to use it in other cases like running unit tests
-docker tag "${DOCKER_FULL_IMAGE_NAME}" "${INPUT_IMAGE_NAME}:latest"
-docker push "${INPUT_IMAGE_NAME}:latest"
-
-# Set the output docker tag we have from here
-echo "::set-output name=image_tag::${INPUT_IMAGE_TAG}"
