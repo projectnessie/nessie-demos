@@ -18,6 +18,11 @@
 INPUT_DOCKER_FULL_IMAGE_NAME=$1
 INPUT_PUSH=$2
 
+if [ -z "${INPUT_DOCKER_FULL_IMAGE_NAME}" ]; then
+  echo 'Input the name of the docker image as the first parameter!'
+  exit 1
+fi
+
 # ghcr.io/projectnessie/nessie-binder-demos:e12478cfb3447af4bc26e535a9daffe374233aa1
 DOCKER_IMAGE_NAME=$(echo "${INPUT_DOCKER_FULL_IMAGE_NAME}" | cut -f1 -d":")
 DOCKER_IMAGE_TAG=$(echo "${INPUT_DOCKER_FULL_IMAGE_NAME}" | cut -f2 -d":")
