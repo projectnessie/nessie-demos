@@ -54,6 +54,30 @@ _HIVE_URL = (
 )
 
 
+def _link_file_into_dir(source_file: str, target_dir: str, replace_if_exists=True) -> None:
+    assert os.path.isfile(source_file)
+    assert os.path.isdir(target_dir)
+
+    source_filename = os.path.basename(source_file)
+    target_file = os.path.join(target_dir, source_filename)
+
+    replaced = False
+    target_exists = os.path.exists(target_file)
+    if target_exists:
+        if not replace_if_exists:
+            print(f"Link target already exists: {target_file}")
+            return
+        if os.path.getsize(target_file) == os.path.getsize(source_file):
+            os.remove(target_file)
+            replaced = True
+
+    os.link(source_file, target_file)
+    assert os.path.isfile(target_file), (source_file, target_file)
+
+    action = 'replaced' if replaced else 'created'
+    print(f"Link target was {action}: {target_file} (source: {source_file})")
+
+
 def _get_unzip(filename: str, url: str) -> None:
     if not os.path.exists(filename):
         response = requests.get(url, stream=True)
@@ -84,16 +108,9 @@ def _copy_all_hadoop_jars_to_pyflink() -> None:
         )
 
     pyflink_lib_dir = _find_pyflink_lib_dir()
-    duplicates = 0
     for _jar_count, jar in enumerate(_jar_files()):
-        try:
-            shutil.copy(jar, pyflink_lib_dir)
-        except FileExistsError:
-            duplicates += 1
-            print(f"Duplicate jar {jar}")
-    print(
-        f"Copied {_jar_count} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir} with {duplicates} duplicates"
-    )
+        _link_file_into_dir(jar, pyflink_lib_dir)
+    print(f"Linked {_jar_count} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}")
 
 
 def _find_pyflink_lib_dir() -> Optional[str]:
@@ -113,7 +130,7 @@ def _jar_files() -> str:
 
 def _get(filename: str, url: str) -> None:
     if os.path.exists(filename):
-        return filename
+        return
     r = requests.get(url)
     with open(filename, "wb") as f:
         f.write(r.content)

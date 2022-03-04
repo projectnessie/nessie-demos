@@ -27,6 +27,8 @@ notebooks/apache-hive-*-bin
 notebooks/metastore_db
 notebooks/*.log
 notebooks/*.out
+# using sed on mac always needs a backup file
+binder/Dockerfile.bak
 *.jar
 
 
