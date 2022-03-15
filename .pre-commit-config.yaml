@@ -43,10 +43,6 @@ repos:
     - id: mixed-line-ending
     - id: check-yaml
     - id: end-of-file-fixer
--   repo: https://github.com/kynan/nbstripout
-    rev: 0.4.0
-    hooks:
-    - id: nbstripout
 -   repo: local
     hooks:
     - id: modify-dockerfile
