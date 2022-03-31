@@ -27,6 +27,6 @@ pytest-mypy==0.9.1
 pytest-runner==6.0.0
 testbook[dev]==0.4.2
 tox==3.24.5
-twine==3.8.0
+twine==4.0.0
 watchdog==2.1.7
 wheel==0.37.1
