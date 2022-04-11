@@ -22,7 +22,7 @@ on:
     types:
       - "completed"
     workflows:
-      - "CI"
+      - "Testing Jupyter Notebooks"
 
 jobs:
   merge:
