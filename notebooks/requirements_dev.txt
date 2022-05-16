@@ -28,5 +28,5 @@ pytest-runner==6.0.0
 testbook[dev]==0.4.2
 tox==3.25.0
 twine==4.0.0
-watchdog==2.1.7
+watchdog==2.1.8
 wheel==0.37.1
