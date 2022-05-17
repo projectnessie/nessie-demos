@@ -81,11 +81,11 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     assertion("!nessie --verbose branch").contains("main").contains("dev")
 
     assertion(
-        "table_env.from_path('main_catalog.nba.`salaries@experiment`').select(lit(1).count).to_pandas()"
+        'table_env.from_path("main_catalog.nba.`salaries@experiment`").select(lit(1).count).to_pandas()'
     ).is_equal_to(num_salaries_on_experiment)
 
     assertion(
-        "table_env.from_path('main_catalog.nba.`salaries@main`').select(lit(1).count).to_pandas()"
+        'table_env.from_path("main_catalog.nba.`salaries@main`").select(lit(1).count).to_pandas()'
     ).is_equal_to(num_salaries_on_main)
 
 

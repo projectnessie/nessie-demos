@@ -73,11 +73,11 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
     assertion("!nessie --verbose branch").contains("main").contains("dev")
 
     assertion_counted(
-        "current_ref.execute('SELECT COUNT(*) FROM nba.salaries')", 2
+        'current_ref.execute("SELECT COUNT(*) FROM nba.salaries")', 2
     ).contains(num_salaries_on_experiment)
 
     assertion_counted(
-        "current_ref.execute('SELECT COUNT(*) FROM nba.salaries')", 3
+        'current_ref.execute("SELECT COUNT(*) FROM nba.salaries")', 3
     ).contains(num_salaries_on_main)
 
 
