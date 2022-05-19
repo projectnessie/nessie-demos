@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020 Dremio
 #
@@ -17,12 +16,11 @@
 #
 """Tests the Nessie + Iceberg + Spark Jupyter Notebook with the NBA dataset."""
 from pathlib import Path
-from typing import Any
-from typing import Generator
+from typing import Iterator
 
 import pytest
-from _pytest.tmpdir import TempPathFactory
 from assertpy import assert_that
+from assertpy.assertpy import AssertionBuilder
 from testbook import testbook
 from testbook.client import TestbookNotebookClient
 from utils import _copy_all_hadoop_jars_to_pyflink
@@ -40,7 +38,7 @@ num_salaries_on_main = """EXPR$0
 
 
 @pytest.fixture(scope="module")
-def notebook(tmpdir_factory: TempPathFactory) -> Generator:
+def notebook() -> Iterator[TestbookNotebookClient]:
     """Pytest fixture to run a notebook."""
     path_to_notebook = _find_notebook("nessie-iceberg-flink-demo-nba.ipynb")
     _copy_all_hadoop_jars_to_pyflink()
@@ -49,7 +47,7 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
     parent_dir = p.parents[1]
     p.rename(parent_dir / p.name)
 
-    with start_nessie() as _:
+    with start_nessie():
         with testbook(path_to_notebook, timeout=360) as tb:
             tb.execute()
             yield tb
@@ -59,12 +57,13 @@ def notebook(tmpdir_factory: TempPathFactory) -> Generator:
 
 def _assert_that_notebook(
     text: str, notebook: TestbookNotebookClient, count: int = 0
-) -> Any:
+) -> AssertionBuilder:
     for seen, value in enumerate(
         n for n, i in enumerate(notebook.cells) if text in i["source"]
     ):
         if seen == count:
             return assert_that(notebook.cell_output_text(value))
+    raise Exception(f"Unable to find cell with text: {text}")
 
 
 def test_notebook_output(notebook: TestbookNotebookClient) -> None:
