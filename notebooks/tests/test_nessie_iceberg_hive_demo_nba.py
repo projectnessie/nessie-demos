@@ -29,7 +29,8 @@ from . import _remove_folders
 from . import start_nessie
 
 num_salaries_on_experiment = "59"
-num_salaries_on_main = "55"
+# TODO: change this back to 55 when we remove the workaround for https://github.com/apache/iceberg/pull/4509
+num_salaries_on_main = "56"
 
 
 @pytest.fixture(scope="module")

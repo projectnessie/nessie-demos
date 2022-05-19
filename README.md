@@ -18,24 +18,26 @@ Some versions have to be updated in multiple places:
 
 ### Nessie
 
-Nessie version is set in Binder at `docker/binder/requirements_base.txt`. Currently, Iceberg and Delta both support only 0.9.x of Nessie.
+Nessie version is set in Binder at `docker/binder/requirements_base.txt`. Currently, the demos are using 0.19.x of Nessie.
 
 ### Iceberg
 
-Currently we are using Iceberg `0.12.0` and it is specified in both iceberg notebooks as well as `docker/utils/__init__.py`
+Currently we are using Iceberg `0.13.1` and it is specified in both iceberg notebooks as well as `docker/utils/__init__.py`
 
 ### Delta
 
-Currently Delta version is taken directly from the Nessie version and isn't explicitly noted. It is currently `1.0.0-nessie`
+Currently, the Delta version is taken directly from the Nessie version and isn't explicitly noted. It is currently `1.0.0-nessie`
+
+See https://github.com/projectnessie/nessie/blob/nessie-0.19.0/pom.xml#L157
 
 ### Spark
 
-Only has to be updated in `docker/binder/requirements.txt`. Currently Iceberg supports 3.0.x and 3.1.x while delta late supports
+Only has to be updated in `docker/binder/requirements.txt`. Currently, Iceberg supports 3.0.x and 3.1.x while delta late supports
 3.1.x only.
 
 ### Flink
 
-Flink version is set in Binder at `docker/binder/requirements_flink.txt`. Currently, Iceberg supports only `1.12.1`.
+Flink version is set in Binder at `docker/binder/requirements_flink.txt`. Currently, we are using `1.13.6`.
 
 ### Hadoop
 
