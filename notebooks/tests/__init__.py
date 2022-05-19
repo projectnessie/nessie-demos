@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020 Dremio
 #
@@ -21,6 +20,8 @@ import platform
 import shutil
 import subprocess  # noqa: S404
 from contextlib import contextmanager
+from typing import Iterator
+from typing import List
 
 from utils import fetch_nessie
 from utils import fetch_nessie_jar
@@ -39,7 +40,7 @@ def _find_notebook(notebook_file: str) -> str:
     return os.path.abspath(path_to_notebook)
 
 
-def _remove_folders(input_folders: [str]) -> None:
+def _remove_folders(input_folders: List[str]) -> None:
     for folder in input_folders:
         path_to_folder = os.path.join(os.path.abspath("."), folder)
         if os.path.exists(path_to_folder):
@@ -50,7 +51,7 @@ def _remove_folders(input_folders: [str]) -> None:
 
 
 @contextmanager
-def start_nessie() -> subprocess.Popen:
+def start_nessie() -> Iterator[subprocess.Popen]:
     """Context for starting and stopping a nessie binary."""
     start_command = _fetch_and_get_nessie_start_command()
     p = None
@@ -64,7 +65,7 @@ def start_nessie() -> subprocess.Popen:
             p.kill()
 
 
-def _fetch_and_get_nessie_start_command() -> [str]:
+def _fetch_and_get_nessie_start_command() -> List[str]:
     operating_system = platform.system().lower()
 
     if operating_system == "darwin":

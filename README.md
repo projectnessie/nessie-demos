@@ -7,7 +7,7 @@ These demos run under binder and can be found at:
 * [Flink and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-flink-demo-nba.ipynb)
 * [Hive and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-hive-demo-nba.ipynb)
 
-The are automatically rebuilt every time we push to main. They are unit tested using `testbook` library to ensure we get
+They are automatically rebuilt every time we push to main. They are unit tested using `testbook` library to ensure we get
 the correct results as the underlying libraries continue to grow/mature.
 
 
