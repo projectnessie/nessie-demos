@@ -71,7 +71,7 @@ def test_notebook_output(notebook: TestbookNotebookClient) -> None:
 
     assertion("findspark.init").contains("Spark Running")
 
-    assertion("CREATE BRANCH dev IN dev_catalog AS main").contains("Branch").contains(
+    assertion("CREATE BRANCH dev IN dev_catalog FROM main").contains("Branch").contains(
         "dev"
     )
 

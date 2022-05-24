@@ -40,9 +40,11 @@ _HADOOP_VERSION = "2.10.1"
 _HADOOP_FILENAME = f"hadoop-{_HADOOP_VERSION}"
 _HADOOP_URL = f"https://archive.apache.org/dist/hadoop/common/hadoop-{_HADOOP_VERSION}/{_HADOOP_FILENAME}.tar.gz"
 
-_ICEBERG_VERSION = "0.12.0"
-_ICEBERG_FLINK_FILENAME = f"iceberg-flink-runtime-{_ICEBERG_VERSION}.jar"
-_ICEBERG_FLINK_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime/{_ICEBERG_VERSION}/{_ICEBERG_FLINK_FILENAME}"
+_FLINK_MAJOR_VERSION = "1.13"
+
+_ICEBERG_VERSION = "0.13.1"
+_ICEBERG_FLINK_FILENAME = f"iceberg-flink-runtime-{_FLINK_MAJOR_VERSION}-{_ICEBERG_VERSION}.jar"
+_ICEBERG_FLINK_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime-{_FLINK_MAJOR_VERSION}/{_ICEBERG_VERSION}/{_ICEBERG_FLINK_FILENAME}"
 _ICEBERG_HIVE_FILENAME = f"iceberg-hive-runtime-{_ICEBERG_VERSION}.jar"
 _ICEBERG_HIVE_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-hive-runtime/{_ICEBERG_VERSION}/{_ICEBERG_HIVE_FILENAME}"
 
@@ -127,10 +129,11 @@ def _jar_files() -> str:
                 yield os.path.join(root, file)
 
 
-def _get(filename: str, url: str) -> None:
+def _download_file(filename: str, url: str) -> None:
     if os.path.exists(filename):
         return
     r = requests.get(url)
+    r.raise_for_status()
     with open(filename, "wb") as f:
         f.write(r.content)
 
@@ -140,7 +143,7 @@ def fetch_nessie() -> str:
     runner = "nessie-quarkus-runner"
 
     url = _get_base_nessie_url()
-    _get(runner, url)
+    _download_file(runner, url)
     os.chmod(runner, os.stat(runner).st_mode | stat.S_IXUSR)
     return runner
 
@@ -150,7 +153,7 @@ def fetch_nessie_jar() -> str:
     runner = "nessie-quarkus-runner.jar"
 
     url = _get_base_nessie_url() + ".jar"
-    _get(runner, url)
+    _download_file(runner, url)
     return runner
 
 
@@ -168,7 +171,7 @@ def fetch_iceberg_flink() -> str:
     """Download flink jar for iceberg."""
     filename = _ICEBERG_FLINK_FILENAME
     url = _ICEBERG_FLINK_URL
-    _get(filename, url)
+    _download_file(filename, url)
     return filename
 
 
@@ -182,7 +185,7 @@ def fetch_iceberg_hive() -> str:
     """Download Hive jar for iceberg."""
     filename = _ICEBERG_HIVE_FILENAME
     url = _ICEBERG_HIVE_URL
-    _get(filename, url)
+    _download_file(filename, url)
     return filename
 
 

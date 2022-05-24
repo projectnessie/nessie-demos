@@ -27,7 +27,7 @@ bash -ex .github/scripts/modify_dockerfile.sh
 
 # avoid remote repository for the rest of the script
 sed -i.bak 's#FROM ghcr.io/projectnessie#FROM projectnessie#' binder/Dockerfile
-trap "sed -i.bak 's#FROM projectnessie#FROM ghcr.io/projectnessie#' binder/Dockerfile" EXIT
+trap "sed -i.bak 's#FROM projectnessie#FROM ghcr.io/projectnessie#' binder/Dockerfile && git add binder/Dockerfile" EXIT
 
 DOCKER_FULL_IMAGE_NAME=$(grep -i 'FROM' binder/Dockerfile | cut -f2 -d" ")
 if docker image inspect "${DOCKER_FULL_IMAGE_NAME}" >/dev/null 2>&1; then
