@@ -2,10 +2,10 @@
 
 These demos run under binder and can be found at:
 
-* [Spark and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-demo-nba.ipynb)
-* [Spark and Delta](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-delta-demo-nba.ipynb)
-* [Flink and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-flink-demo-nba.ipynb)
-* [Hive and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?filepath=notebooks/nessie-iceberg-hive-demo-nba.ipynb)
+* [Spark and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-iceberg-demo-nba.ipynb)
+* [Spark and Delta](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-delta-demo-nba.ipynb)
+* [Flink and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-iceberg-flink-demo-nba.ipynb)
+* [Hive and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-iceberg-hive-demo-nba.ipynb)
 
 They are automatically rebuilt every time we push to main. They are unit tested using `testbook` library to ensure we get
 the correct results as the underlying libraries continue to grow/mature.
