@@ -51,6 +51,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install tox tox-gh-actions build
       - name: Check Dockerfile hash is up-to-date
+        if: github.actor != 'dependabot[bot]'
         run: |
           bash -ex .github/scripts/modify_dockerfile.sh
           changed_hash=$(git status --porcelain binder/Dockerfile)
