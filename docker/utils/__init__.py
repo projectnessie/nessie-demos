@@ -82,6 +82,7 @@ def _link_file_into_dir(source_file: str, target_dir: str, replace_if_exists=Tru
 def _get_unzip(filename: str, url: str) -> None:
     if not os.path.exists(filename):
         response = requests.get(url, stream=True)
+        response.raise_for_status()
         with tarfile.open(fileobj=response.raw, mode="r|gz") as file:
             file.extractall(path=".")
 
