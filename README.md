@@ -32,8 +32,8 @@ See https://github.com/projectnessie/nessie/blob/nessie-0.30.0/pom.xml#L171
 
 ### Spark
 
-Only has to be updated in `docker/binder/requirements.txt`. Currently, Iceberg supports 3.0.x and 3.1.x while delta late supports
-3.1.x only.
+Only has to be updated in `docker/binder/requirements.txt`. Currently, Iceberg supports 3.0, 3.1 and 3.2 while deltalake supports
+3.2 only, which we thus use in these demos.
 
 ### Flink
 
