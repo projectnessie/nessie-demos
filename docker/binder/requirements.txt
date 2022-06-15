@@ -2,4 +2,4 @@
 findspark==2.0.1
 pandas==1.3.5
 pyhive[hive]==0.6.5
-pyspark==3.2.1
+pyspark==3.3.0
