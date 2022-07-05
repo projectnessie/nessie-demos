@@ -22,7 +22,7 @@ jupyterlab==3.4.3
 nbstripout==0.5.0
 pip==22.1.2
 pytest==7.1.2
-pytest-mock==3.8.1
+pytest-mock==3.8.2
 pytest-mypy==0.9.1
 pytest-runner==6.0.0
 testbook[dev]==0.4.2
