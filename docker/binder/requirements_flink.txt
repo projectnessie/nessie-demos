@@ -1,4 +1,4 @@
 -r requirements_base.txt
 apache-flink==1.13.6
 # flink requires pandas<1.2.0 see https://github.com/apache/flink/blob/release-1.13.6/flink-python/setup.py#L313
-pandas==1.1.5
+pandas==1.4.4
