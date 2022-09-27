@@ -4,7 +4,7 @@
     "config:base",
     // https://docs.renovatebot.com/presets-npm/
     "npm:unpublishSafe",
-    // Required to not pin dependencies to _exact_ versions (npm + pip)
+    // Required to not pin dependencies to _exact_ versions
     ":preserveSemverRanges"
   ],
 
@@ -19,15 +19,9 @@
       platformAutomerge: true
     },
 
-    // Schedule npm + pip on weekends
-    {
-      matchManagers: ["pip_requirements", "pip_setup"],
-      extends: ["schedule:weekends"]
-    },
-
     // Check for major updates, but do not merge automatically
     {
-      matchManagers: ["npm", "pip_requirements", "pip_setup"],
+      matchManagers: ["pip_requirements", "pip_setup"],
       matchUpdateTypes: ["major"],
       automerge: false
     }
