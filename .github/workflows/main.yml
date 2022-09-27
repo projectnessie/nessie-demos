@@ -21,7 +21,7 @@ on:
 
 jobs:
   trigger-binder-build:
-    if: "!contains(github.event.commits[0].author.name, 'dependabot')"
+    if: "!contains(github.event.commits[0].author.name, 'renovate')"
     runs-on: ubuntu-latest
     steps:
       - uses: s-weigand/trigger-mybinder-build@v1

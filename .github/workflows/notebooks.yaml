@@ -21,11 +21,11 @@ on:
     branches: [ main ]
     paths-ignore:
       - '**/*.md'
-      - '.github/dependabot.yml'
+      - '.github/renovate.json5'
   pull_request:
     paths-ignore:
       - '**/*.md'
-      - '.github/dependabot.yml'
+      - '.github/renovate.json5'
 
 jobs:
   python:
