@@ -27,6 +27,10 @@ on:
       - '**/*.md'
       - '.github/renovate.json5'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   python:
     name: Testing Jupyter Notebooks
@@ -34,12 +38,25 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.7]
+        python-version: ['3.10']
 
     steps:
       - uses: actions/checkout@v3
       - name: Install system dependencies
         run: sudo apt-get install libsasl2-dev libsasl2-modules
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          # Need Java 8 for Hive + 11 for Spark (and Nessie)
+          java-version: |
+            8
+            11
+      - name: setup JAVAx_HOME
+        run: |
+          echo "JAVA8_HOME=$JAVA_HOME_8_X64" >> ${GITHUB_ENV}
+          echo "JAVA11_HOME=$JAVA_HOME_11_X64" >> ${GITHUB_ENV}
+          echo "JAVA_HOME=$JAVA_HOME_11_X64" >> ${GITHUB_ENV}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -50,8 +67,22 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install tox tox-gh-actions build
+      - name: Cache Tools (Hadoop, Hive, Spark)
+        id: cache-tools
+        uses: actions/cache@v3
+        with:
+          path: |
+            notebooks/hadoop-*
+            notebooks/apache-hive-*
+            notebooks/spark-*
+            notebooks/iceberg-*.jar
+            notebooks/nessie-quarkus-*.jar
+          key: tools-cache-${{ hashFiles('docker/utils/__init__.py') }}
+      - name: Check Dockerfile has correct registry
+        run: |
+          grep -q 'FROM ghcr.io/projectnessie/nessie-binder-demos:.*' binder/Dockerfile
       - name: Check Dockerfile hash is up-to-date
-        if: github.actor != 'dependabot[bot]'
+        if: github.actor != 'renovate'
         run: |
           bash -ex .github/scripts/modify_dockerfile.sh
           changed_hash=$(git status --porcelain binder/Dockerfile)
@@ -63,5 +94,10 @@ jobs:
           fi
           echo "PASSED: Dockerfile hash is up-to-date!"
       - name: Test Notebooks with Tox
-        working-directory: notebooks/tests
+        working-directory: notebooks/
         run: tox
+      - name: Dump Hive output on error
+        working-directory: notebooks/
+        if: failure()
+        run: |
+          cat nohup.out

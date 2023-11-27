@@ -25,6 +25,7 @@ notebooks/iceberg-*-runtime-*
 notebooks/hadoop-*
 notebooks/apache-hive-*-bin
 notebooks/metastore_db
+notebooks/hiveserver2.pid
 notebooks/*.log
 notebooks/*.out
 # using sed on mac always needs a backup file
@@ -37,6 +38,9 @@ venv/
 .tox/
 __pycache__/
 .pytest_cache
+
+# pyenv
+.python-version
 
 # Jetbrains IDEs
 /.idea

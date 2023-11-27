@@ -3,7 +3,6 @@
 These demos run under binder and can be found at:
 
 * [Spark and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-iceberg-demo-nba.ipynb)
-* [Spark and Delta](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-delta-demo-nba.ipynb)
 * [Flink and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-iceberg-flink-demo-nba.ipynb)
 * [Hive and Iceberg](https://mybinder.org/v2/gh/projectnessie/nessie-demos/main?labpath=notebooks%2Fnessie-iceberg-hive-demo-nba.ipynb)
 
@@ -22,13 +21,7 @@ Nessie version is set in Binder at `docker/binder/requirements_base.txt`. Curren
 
 ### Iceberg
 
-Currently we are using Iceberg `0.13.1` and it is specified in both iceberg notebooks as well as `docker/utils/__init__.py`
-
-### Delta
-
-Currently, the Delta version is taken directly from the Nessie version and isn't explicitly noted. It is currently `1.1.0-nessie`
-
-See https://github.com/projectnessie/nessie/blob/nessie-0.30.0/pom.xml#L171
+Currently we are using Iceberg `1.4.2` and it is specified in both iceberg notebooks as well as `docker/utils/__init__.py`
 
 ### Spark
 
@@ -37,7 +30,7 @@ Only has to be updated in `docker/binder/requirements.txt`. Currently, Iceberg s
 
 ### Flink
 
-Flink version is set in Binder at `docker/binder/requirements_flink.txt`. Currently, we are using `1.13.6`.
+Flink version is set in Binder at `docker/binder/requirements_flink.txt`. Currently, we are using `1.17.1`.
 
 ### Hadoop
 
@@ -60,7 +53,7 @@ Of course, Binder just lets a user "simply start" a notebook via a simple "click
 
 ## Development
 For development, you will need to make sure to have the following installed:
-- Python 3.7+
+- Python 3.10+
 - pre-commit
 
 Regarding pre-commit, you will need to make sure is installed through `pre-commit install` in order to install the hooks locally since this repo

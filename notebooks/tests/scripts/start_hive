@@ -10,6 +10,25 @@ HIVE_VERSION=$(python -c "import utils;print(utils._HIVE_VERSION)")
 
 export HADOOP_HOME=$PWD/hadoop-$HADOOP_VERSION
 
+# Check for Java 8 + 11 for tox (also in /docker/binder/start.hive)
+if [[ -z ${JAVA8_HOME} || -z ${JAVA11_HOME} || ! -d ${JAVA8_HOME} || ! -d ${JAVA11_HOME} ]] ; then
+  cat <<! > /dev/stderr
+
+
+============================================================================================================
+Define the JAVA8_HOME and JAVA11_HOME environment variables to point to Java 8 and Java 11 development kits.
+============================================================================================================
+
+Need Java 8 for Hive server to work.
+Java 11 (not newer!) is required for Spark, but also Nessie.
+
+
+!
+  exit 1
+fi
+
 #Start Hive
+echo "Starting Hive for tox, current directory: $(pwd)"
+rm -f nohup.out derby.log
 chmod +x $PWD/../docker/binder/start.hive
 nohup $PWD/../docker/binder/start.hive $PWD $PWD/../docker/binder/resources $HIVE_VERSION

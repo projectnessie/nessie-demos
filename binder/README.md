@@ -1,8 +1,8 @@
 ## Building binder locally
 
 ### Prerequisites
-You need to have a python 3.7+ installed. 
-We recommend to use [pyenv](https://github.com/pyenv/pyenv) for managing your python environment(s). 
+You need to have a python 3.10+ installed.
+We recommend to use [pyenv](https://github.com/pyenv/pyenv) for managing your python environment(s).
 
 To build the binder image locally, firstly, you need to install `jupyter-repo2docker` dependency:
 
@@ -29,8 +29,8 @@ Run (or look into) the `build_run_local_docker.sh` script how to do this semi-au
 After those steps, the binder should be running on your local machine.
 Next, find the output similar to this:
 ```shell
-[C 13:38:25.199 NotebookApp] 
-    
+[C 13:38:25.199 NotebookApp]
+
     To access the notebook, open this file in a browser:
         file:///home/jovyan/.local/share/jupyter/runtime/nbserver-40-open.html
     Or copy and paste this URL:

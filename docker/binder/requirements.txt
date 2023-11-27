@@ -1,5 +1,7 @@
 -r requirements_base.txt
 findspark==2.0.1
-pandas==1.3.5
-pyhive[hive]==0.6.5
-pyspark==3.2.1
+# Need this numpy version due to compatibility reasons with numpy/pyspark
+numpy==1.21.6
+pandas==1.5.3
+pyhive[hive_pure_sasl]==0.7.0
+pyspark==3.2.4
