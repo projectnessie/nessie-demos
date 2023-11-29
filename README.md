@@ -17,7 +17,7 @@ Some versions have to be updated in multiple places:
 
 ### Nessie
 
-Nessie version is set in Binder at `docker/binder/requirements_base.txt`. Currently, the demos are using 0.30.x of Nessie.
+Nessie version is set in Binder at `docker/binder/requirements_base.txt`. Currently, the demos are using 0.74.x of Nessie.
 
 ### Iceberg
 
@@ -25,8 +25,7 @@ Currently we are using Iceberg `1.4.2` and it is specified in both iceberg noteb
 
 ### Spark
 
-Only has to be updated in `docker/binder/requirements.txt`. Currently, Iceberg supports 3.0, 3.1 and 3.2 while deltalake supports
-3.2 only, which we thus use in these demos.
+Only has to be updated in `docker/binder/requirements.txt`. Currently, Iceberg supports 3.2, 3.3, 3.4 and 3.5, we use Spark 3.2 in the demos.
 
 ### Flink
 
