@@ -45,7 +45,7 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get install libsasl2-dev libsasl2-modules
       - name: Set up Java
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           # Need Java 8 for Hive + 11 for Spark (and Nessie)
