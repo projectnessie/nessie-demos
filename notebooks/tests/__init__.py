@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020 Dremio
 #
@@ -16,14 +17,12 @@
 #
 """Unit tests for demo notebooks."""
 import os
-import platform
 import shutil
 import subprocess  # noqa: S404
 from contextlib import contextmanager
 from typing import Iterator
 from typing import List
 
-from utils import fetch_nessie
 from utils import fetch_nessie_jar
 
 
@@ -66,12 +65,5 @@ def start_nessie() -> Iterator[subprocess.Popen]:
 
 
 def _fetch_and_get_nessie_start_command() -> List[str]:
-    operating_system = platform.system().lower()
-
-    if operating_system == "darwin":
-        # In Mac case, we use the nessie jar
-        runner = fetch_nessie_jar()
-        return ["java", "-jar", runner]
-    else:
-        runner = fetch_nessie()
-        return ["./" + runner]
+    runner = fetch_nessie_jar()
+    return ["java", "-jar", runner]

@@ -15,19 +15,33 @@
 # limitations under the License.
 #
 
-nohup ./nessie-quarkus-runner &
-
 SPARK_VERSION=$(python -c "import utils;print(utils._SPARK_VERSION)")
 HADOOP_VERSION=$(python -c "import utils;print(utils._HADOOP_VERSION)")
 HIVE_VERSION=$(python -c "import utils;print(utils._HIVE_VERSION)")
 
-export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export JAVA11_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export JAVA8_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=$JAVA11_HOME
+export PATH=$JAVA_HOME/bin:$PATH
+
+nohup java -jar nessie-quarkus-runner.jar > nohup-nessie.out &
+# Wait until Nessie is ready to accept requests.
+echo "Waiting up to 180 seconds for Nessie to be ready..."
+for _ in seq 1 180 ; do
+  (netstat -ant | grep -q ':19120 .* LISTEN') && break
+  sleep 1
+done
+if [[ $(netstat -ant | grep -q ':19120 .* LISTEN') -gt 0 ]] ; then
+  echo "Nessie did not start / not listening on port 19120!"
+  exit 1
+fi
+echo "Nessie listening on port 19120."
 
 export SPARK_HOME=$PWD/spark-$SPARK_VERSION-bin-hadoop3.2
 export HADOOP_HOME=$PWD/hadoop-$HADOOP_VERSION
 
 #Start Hive
 chmod +x $PWD/binder/start.hive
-nohup $PWD/binder/start.hive $PWD $PWD/binder/resources $HIVE_VERSION
+nohup $PWD/binder/start.hive $PWD $PWD/binder/resources $HIVE_VERSION > nohup-hive.out
 
 exec "$@"

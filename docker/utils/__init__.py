@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Copyright (C) 2020 Dremio
 #
@@ -18,7 +19,6 @@
 import os
 import shutil
 import site
-import stat
 import sysconfig
 import tarfile
 from typing import Optional
@@ -36,14 +36,18 @@ except ImportError:
     _SPARK_FILENAME = None
     _SPARK_URL = None
 
-_HADOOP_VERSION = "2.10.1"
+_NESSIE_VERSION = "0.74.0"
+
+_HADOOP_VERSION = "2.10.2"
 _HADOOP_FILENAME = f"hadoop-{_HADOOP_VERSION}"
 _HADOOP_URL = f"https://archive.apache.org/dist/hadoop/common/hadoop-{_HADOOP_VERSION}/{_HADOOP_FILENAME}.tar.gz"
 
-_FLINK_MAJOR_VERSION = "1.13"
+_FLINK_MAJOR_VERSION = "1.17"
 
-_ICEBERG_VERSION = "0.13.1"
-_ICEBERG_FLINK_FILENAME = f"iceberg-flink-runtime-{_FLINK_MAJOR_VERSION}-{_ICEBERG_VERSION}.jar"
+_ICEBERG_VERSION = "1.4.2"
+_ICEBERG_FLINK_FILENAME = (
+    f"iceberg-flink-runtime-{_FLINK_MAJOR_VERSION}-{_ICEBERG_VERSION}.jar"
+)
 _ICEBERG_FLINK_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-flink-runtime-{_FLINK_MAJOR_VERSION}/{_ICEBERG_VERSION}/{_ICEBERG_FLINK_FILENAME}"
 _ICEBERG_HIVE_FILENAME = f"iceberg-hive-runtime-{_ICEBERG_VERSION}.jar"
 _ICEBERG_HIVE_URL = f"https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-hive-runtime/{_ICEBERG_VERSION}/{_ICEBERG_HIVE_FILENAME}"
@@ -55,7 +59,9 @@ _HIVE_URL = (
 )
 
 
-def _link_file_into_dir(source_file: str, target_dir: str, replace_if_exists=True) -> None:
+def _link_file_into_dir(
+    source_file: str, target_dir: str, replace_if_exists=True
+) -> None:
     assert os.path.isfile(source_file)
     assert os.path.isdir(target_dir)
 
@@ -75,7 +81,7 @@ def _link_file_into_dir(source_file: str, target_dir: str, replace_if_exists=Tru
     os.link(source_file, target_file)
     assert os.path.isfile(target_file), (source_file, target_file)
 
-    action = 'replaced' if replaced else 'created'
+    action = "replaced" if replaced else "created"
     print(f"Link target was {action}: {target_file} (source: {source_file})")
 
 
@@ -112,7 +118,9 @@ def _copy_all_hadoop_jars_to_pyflink() -> None:
     pyflink_lib_dir = _find_pyflink_lib_dir()
     for _jar_count, jar in enumerate(_jar_files()):
         _link_file_into_dir(jar, pyflink_lib_dir)
-    print(f"Linked {_jar_count} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}")
+    print(
+        f"Linked {_jar_count} HADOOP jar files into the pyflink lib dir at location {pyflink_lib_dir}"
+    )
 
 
 def _find_pyflink_lib_dir() -> Optional[str]:
@@ -139,16 +147,6 @@ def _download_file(filename: str, url: str) -> None:
         f.write(r.content)
 
 
-def fetch_nessie() -> str:
-    """Download nessie executable."""
-    runner = "nessie-quarkus-runner"
-
-    url = _get_base_nessie_url()
-    _download_file(runner, url)
-    os.chmod(runner, os.stat(runner).st_mode | stat.S_IXUSR)
-    return runner
-
-
 def fetch_nessie_jar() -> str:
     """Download nessie Jar in order to run the tests in Mac"""
     runner = "nessie-quarkus-runner.jar"
@@ -159,12 +157,8 @@ def fetch_nessie_jar() -> str:
 
 
 def _get_base_nessie_url() -> str:
-    import pynessie
-
-    version = pynessie.__version__
-
     return "https://github.com/projectnessie/nessie/releases/download/nessie-{}/nessie-quarkus-{}-runner".format(
-        version, version
+        _NESSIE_VERSION, _NESSIE_VERSION
     )
 
 
