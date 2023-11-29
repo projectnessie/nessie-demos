@@ -18,7 +18,7 @@ assertpy==1.1
 build==0.10.0
 bump2version==1.0.1
 ipython==8.18.0
-jupyterlab==3.6.6
+jupyterlab==4.0.9
 nbstripout==0.6.1
 pip==23.3.1
 pytest==7.4.3
