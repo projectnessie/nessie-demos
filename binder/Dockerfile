@@ -1,4 +1,4 @@
-# Base image to use for demos.
+# Base image to use for demos in (my)binder.
 
 # Tag will be automatically generated through pre-commit hook if any changes
 # happened in the docker/ folder
@@ -12,3 +12,22 @@ COPY notebooks/*.ipynb notebooks/
 
 # Copy all the needed datasets for the demos
 COPY datasets/ datasets/
+
+# install the notebook package
+RUN pip install --no-cache --upgrade pip && \
+    pip install --no-cache notebook jupyterlab traitlets
+
+ARG NB_USER
+ARG NB_UID
+
+# Verify that the requested notebook user name+id match the current ones
+RUN id -nu | grep -q $NB_USER
+RUN id -u | grep -q $NB_UID
+
+# Add a custom entrypoint script (required by binder due to custom args)
+USER root
+COPY binder/entrypoint-demos.sh /entrypoint-demos.sh
+RUN chmod +x /entrypoint-demos.sh
+WORKDIR ${HOME}
+USER ${USER}
+ENTRYPOINT ["/entrypoint-demos.sh"]
