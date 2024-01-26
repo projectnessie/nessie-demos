@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 #
 # Copyright (C) 2020 Dremio
 #
@@ -13,20 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
--r requirements.txt
-assertpy==1.1
-build==0.10.0
-bump2version==1.0.1
-ipython==8.18.0
-jupyterlab==4.0.9
-nbstripout==0.6.1
-pip==23.3.1
-pytest==7.4.3
-pytest-mock==3.12.0
-pytest-mypy==0.10.3
-pytest-runner==6.0.0
-testbook[dev]==0.4.2
-tox==4.11.3
-twine==4.0.1
-watchdog==2.1.9
-wheel==0.41.3
+set -e
+
+echo ""
+echo "HELLO WORLD"
+echo "HELLO WORLD"
+echo "HELLO WORLD"
+echo "HELLO WORLD"
+echo ""
+echo "$@" >> /dev/stderr
+echo "$@"
+echo ""
+echo ""
+echo ""
+
+exec "$@"
