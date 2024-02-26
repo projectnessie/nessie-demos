@@ -4,4 +4,4 @@ findspark==2.0.1
 numpy==1.21.6
 pandas==1.5.3
 pyhive[hive_pure_sasl]==0.7.0
-pyspark==3.2.4
+pyspark==3.5.1
