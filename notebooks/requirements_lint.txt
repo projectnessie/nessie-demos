@@ -15,7 +15,7 @@
 #
 -r requirements_dev.txt
 bandit==1.7.5
-black[jupyter]==23.11.0
+black[jupyter]==23.12.1
 flake8==6.1.0
 flake8-annotations==3.0.1
 flake8-bandit==4.1.1
