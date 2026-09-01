@@ -1,2 +1,2 @@
 -r requirements_base.txt
-apache-flink==1.17.1
+apache-flink==2.3.0
