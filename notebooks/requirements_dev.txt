@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 -r requirements.txt
-assertpy==1.1
+assertpy==2.36.0
 build==0.10.0
 bump2version==1.0.1
 ipython==8.18.0
